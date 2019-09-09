@@ -21,8 +21,13 @@
          <label for="nombre">Nombre</label>
         <input class="form-control" type="text" placeholder="" style="width:50%;" name=nombre>
         <br>
-        <label for="nombre">Direccion</label>
-        <input class="form-control" type="text" placeholder="" name=direccion>
+        <label for="direccion">Direccion</label>
+        <input class="form-control" type="text" placeholder="" style="width:50%;" name=direccion>
+        <br>
+        <label for="Descripcion">Descripcion</label>
+        <input class="form-control" type="text" placeholder="" style="width:50%;" name=descripcion>
+
+
       </div>
         <a href="#"  onclick="document.getElementById('nuevo_deposito').submit();" class="btn btn-success btn-icon-split">
          <span class ="icon text-white-50">

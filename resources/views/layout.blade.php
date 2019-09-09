@@ -32,6 +32,7 @@
       <!-- Main Content -->
       <div id="content">
         @include('topbar')
+        @include('flash-message')
         @yield('content')
 
 

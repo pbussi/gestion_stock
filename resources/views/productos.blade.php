@@ -9,7 +9,7 @@
           <div class="card shadow mb-4">
             <div class="card-header py-3">
               <h6 class="m-0 font-weight-bold text-primary">Productos
-              <a href="#" class=" btn btn-success btn-icon-split float-right">
+              <a href="{{ url('/producto_nuevo') }}"  class=" btn btn-success btn-icon-split float-right">
                     <span class="icon text-white-50">
                       <i class="fas fa-check-double"></i>
                     </span>
@@ -58,7 +58,7 @@
                       <td>{{ $p->stock_maximo }}</td>
                       <td>{{ $p->punto_pedido }}</td>
                       <td class="w-10"> 
-                        <a href="#" class="float-left">
+                        <a href="{{ url('/producto_edit',$p->id) }}" class="float-left">
                         <span class="icon">
                           <i class="fas fa-edit"></i>
                         </span>

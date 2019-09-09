@@ -11,7 +11,7 @@
           <div class="card shadow mb-4">
             <div class="card-header py-3">
               <h6 class="m-0 font-weight-bold text-primary">Listado de Depositos
-              <a href="{{ url('/deposito_nuevo') }}"" class=" btn btn-success btn-icon-split float-right">
+              <a href="{{ url('/deposito_nuevo') }}" class=" btn btn-success btn-icon-split float-right">
                     <span class="icon text-white-50">
                       <i class="fas fa-check-double"></i>
                     </span>
@@ -39,16 +39,16 @@
               <tr>
               <th scope="row">{{ $d->id }}</th>
               <td><a href=""> {{ $d->nombre }}</a></td>
-               <td></td>
+               <td>{{ $d->descripcion}}</td>
               <td>{{ $d->direccion }}</td>
               <td class="w-10"> 
-                        <a href="#" class="float-left">
+                        <a href="{{ url('/deposito_edit',$d->id) }}" class="float-left">
                         <span class="icon">
                           <i class="fas fa-edit"></i>
                         </span>
                       </a>
                       &nbsp;  &nbsp;
-                      <a href="#" class="">
+                      <a href="{{ url('/deposito_delete',$d->id) }}" class="">
                         <span class="icon">
                           <i class="fas fa-trash"></i>
                         </span>
