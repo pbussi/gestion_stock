@@ -46,24 +46,3 @@
 
 @endsection
 
-
-{{--
-<div class="row">
-    <div class="col-sm">
-
-      <h3 id="sizing" style="margin-top: 50px;"><span class="bd-content-title">Crear Nuevo Deposito</span></h3>
-
-    <form action="{{ url('/deposito_nuevo') }}"  method=POST>
-      @csrf
-      <div class="form-group">
-         <label for="nombre">Nombre</label>
-        <input class="form-control" type="text" placeholder="" style="width:50%;" name=nombre>
-        <br>
-        <label for="nombre">Direccion</label>
-        <input class="form-control" type="text" placeholder="" name=direccion>
-      </div>
-      <input type="submit" class="btn btn-primary" value=Crear>
-    </form>
-    </div>
-</div>
---}}
