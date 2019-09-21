@@ -3,7 +3,7 @@
  <div class="container-fluid">
           <!-- Page Heading -->
           <h1 class="h3 mb-2 text-gray-800">Movimientos</h1>
-          <p class="mb-4">Ingreso de Materias Primas</p>
+          <p class="mb-4">Ingreso de Materias Primas e Insumos</p>
           <!-- DataTales Example -->
           <div class="card shadow mb-4">
             <div class="card-header py-3">
@@ -12,23 +12,32 @@
             <div class="card-body">
  <form class="user" action="{{ url('/movimiento_mp_ingreso') }}" id=movimiento_mp_ingreso method=POST>
       @csrf
+        <input type=hidden name=id value="{{$producto->id}}">
+        <div class="form-group row">
+            <div class="col-sm-2 mb-3 mb-sm-0">
+               <label for="fecha_mov">Fecha de Ingreso</label>
+              <input class="form-control" type="date" name=fecha_movimiento value="{{ date('Y-m-d') }}">
+            </div>
 
-          <!--div class="form-group row"> 
-              <div class="col-sm-6 mb-3 mb-sm-0">
-                 <label for="tipo_prod">Producto</label>
-                 <p>{{$producto->nombre}}</p>
-              </div>
-          </div-->
+        </div>
 
-         <div class="form-group row">
-            <div class="col-sm-6 mb-3 mb-sm-0">
-              <input class="form-control" type="text" placeholder="Numero de Lote" name=lote_numero>
+          <div class="form-group row">
+
+            <div class="col-sm-4 mb-3 mb-sm-0">
+              <label for="lote_numero">Numero de Lote</label>
+              <input class="form-control" type="text" name=lote_numero>
             </div>
             <div class="col-sm-3">
-              <input class="form-control" type="text" placeholder="Fecha Vencimiento" name=lote_fechavencimiento>
+                <label for="lote_fechavencimiento">Fecha de Vencimiento</label>
+              <input class="form-control" type="date"  name=lote_fechavencimiento>
             </div>
             <div class="col-sm-3 mb-3 mb-sm-0">
-               <input class="form-control" type="text" placeholder="Cantidad" name=movimiento_cantidad>
+                <label for="movimiento_cantidad">Cantidad</label>
+               <input class="form-control text-primary" type="text" name=movimiento_cantidad style="font-weight: bold; >
+            </div>
+             <div class="col-sm-2 mb-3 mb-sm-0">
+                <label for="unidad_medida">Unidad de Medida</label>   
+                <input class="form-control" type="text" name=unidad_medida readonly="readonly" placeholder="{{ $producto->unidad_medida }}">
             </div>
         </div>
          
@@ -44,7 +53,8 @@
           </div>
           <div class="form-group row"> 
               <div class="col-sm-6 mb-3 mb-sm-0">           
-                  <label for="stkmin">Comprobante asociado</label>
+                  <label for="movie
+                  ">Comprobante asociado</label>
                   <input class="form-control" type="text" placeholder="" name=movimiento_comprobante_asociado>
               </div>
                <div class="col-sm-6 mb-3 mb-sm-0"> 
@@ -55,7 +65,7 @@
 
        <div class="form-group row"> 
             <div class="col-sm-4 mb-3 mb-sm-0">
-              <a href="#"  onclick="document.getElementById('nuevo_prod').submit();" class="btn btn-success btn-icon-split">
+              <a href="#"  onclick="document.getElementById('movimiento_mp_ingreso').submit();" class="btn btn-success btn-icon-split">
                <span class ="icon text-white-50">
                           <i class="fas fa-check-double"></i>
                </span>

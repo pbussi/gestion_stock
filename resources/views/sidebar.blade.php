@@ -41,7 +41,7 @@
             <a class="collapse-item" href="{{ url('/depositos') }}">Depositos</a>
             <h6 class="collapse-header">Movimientos:</h6>
             <a class="collapse-item" href="{{ url('/movimiento_mp_ingreso_seleccion') }}">Ingresos de Insumos</a>
-            <a class="collapse-item" href="cards.html">Egresos de Insumos</a>
+            <a class="collapse-item" href="{{ url('/movimiento_mp_salida_seleccion') }}">Egresos de Insumos</a>
             <a class="collapse-item" href="buttons.html">Ingresos de Productos</a>
             <h6 class="collapse-header">Informes</h6>
             <a class="collapse-item" href="cards.html">Stock a fecha</a>

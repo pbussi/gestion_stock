@@ -19,7 +19,7 @@
             </div>
             <div class="card-body">
               <div class="table-responsive">
-                <table class="table table-bordered small" id="dataTable" width="100%" cellspacing="0">
+                <table class="table table-bordered table-striped small" id="dataTable" width="100%" cellspacing="0">
                   <thead>
                     <tr>
                       <th scope="col">#</th>

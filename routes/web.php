@@ -12,15 +12,13 @@
 */
 use Illuminate\Support\Facades\DB;
 
-require_once('productos.php');
+/*include_once('productos.php');
 require_once('depositos.php');
-require_once('movimientos_mp.php');
+require_once('movimientos_mp.php');*/
 
 Route::get('/', function () {
     return view('inicio');
 });
-
-
 
 
 
