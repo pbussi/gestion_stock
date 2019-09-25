@@ -101,15 +101,24 @@ Route::post('/movimiento_mp_salida', function () {
 Route::get('/movimiento_producto/{id}', function ($id) {
 	$productos = DB::select('select * from productos where id=?',[$id]);
 	$producto=$productos[0];
-
-	$lotes=DB::select('select * from lotes_mp WHERE productos_id=?',[$id]);
-	print_r($lotes);
-
-	$saldos = DB::select('SELECT d.id as id_deposito,d.nombre as nombre_deposito,l.id as id_lote,l.numero as numero_lote,sum(cantidad) as saldo 
-		FROM movimientos m,lotes_mp l,depositos d 
-		WHERE m.lotes_mp_id=l.id and m.depositos_id=d.id and l.productos_id=? group by d.id,d.nombre,l.id,l.numero having sum(cantidad)>0',[$id]);
-
 	
-	$depositos = DB::select('select * from depositos where visible=true');
-    return view('movimiento_producto',['producto' => $producto,'saldos' => $saldos,]);
+
+	$movs = DB::select('SELECT m.*, d.nombre as deposito, l.numero as lote, l.vencimiento as vencimiento FROM movimientos m, lotes_mp l, depositos d where m.lotes_mp_id=l.id and l.productos_id=? and m.depositos_id=d.id order by fecha asc;',[$id]);
+
+
+	$movimientos=array();
+	foreach ($movs as $mov) {
+		$movimientos[$mov->deposito][]=$mov;
+	}
+
+	$saldoxdep=DB::select('select m.depositos_id as dep, sum(cantidad) as saldo from movimientos m, lotes_mp l where l.id=m.lotes_mp_id and l.productos_id=? group by m.depositos_id',[$id]);
+	
+
+	$saldodeposito=array();
+	foreach($saldoxdep as $s){
+		$saldodeposito[$s->dep]['saldo']=$s->saldo;
+	}
+	
+
+    return view('movimiento_producto',['producto' => $producto,'saldosxdep'=>$saldodeposito,'movimientos' => $movimientos,'saldos'=>array()]);
 })->name('movimiento_[producto]');

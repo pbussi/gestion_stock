@@ -46,7 +46,7 @@
                         <img src='data:image/JPG;base64,{{base64_encode($p->imagen)}}' width=60px;/>
                         @endif
                       </td>
-                      <td><a href="">{{ $p->nombre }}</a></td>
+                      <td><a href="{{ url('/movimiento_producto',$p->id) }}">{{ $p->nombre }}</a></td>
                       <td>{{ $p->marca }}</td>
                       <td>{{ $p->unidad_medida }}</td>
                       <td>{{ $p->tipo_nombre }}</td>
