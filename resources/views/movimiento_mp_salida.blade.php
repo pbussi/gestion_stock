@@ -34,7 +34,7 @@
                     <th>DEPOSITO</th>
                       <th>LOTE Nro.</th>
                       <th>SALDO</th>
-                      <th>Movimientos</th>
+                     
                    </tr>
                   </thead>
                 @foreach ($saldos as $p)
@@ -43,11 +43,7 @@
                     <td>{{$p->nombre_deposito}}</td>
                     <td>{{ $p->numero_lote }}</td> 
                     <td class="text-info"> {{ $p->saldo }} {{ $producto->unidad_medida }}</td>
-                    <td> <a href="{{ url('/movimiento_producto',$producto->id) }}" class="float-left">
-                        <span class="icon">
-                          <i class="fas fa-edit"></i>
-                        </span>
-                      </a></td>
+                   
                     
                   </tr>
                 @endforeach
@@ -77,6 +73,17 @@
                 <label for="stkmax">Observaciones</label>
                 <input class="form-control" type="textarea" placeholder=""  name=movimientos_observaciones>
           </div>
+
+              <div class="col-sm-4 mb-3 mb-sm-0">
+                 <label for="tipo_prod">Destino</label>
+                 <select class="form-control"  name=destino>
+                 @foreach ($destinos as $d)
+                  <option value={{$d->id}}>{{$d->nombre}}</option>
+                @endforeach
+              </select>
+              </div>
+         
+
        </div>
 
        <div class="form-group row"> 

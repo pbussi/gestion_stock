@@ -42,3 +42,48 @@ Route::post('/producto_edit', function () {
     return redirect()->route('productos')->with('success','Item actualizado!');; 
    
 });
+
+
+
+
+
+///////////////// APIS
+
+
+Route::get('/producto_depositos_saldo/{id}', function ($id) {
+
+	$depositos_saldo= DB::select('select d.id as id_deposito,d.nombre,sum(cantidad) from lotes_mp mp, movimientos m,depositos d where mp.productos_id=? and mp.id=m.lotes_mp_id and m.depositos_id=d.id group by d.id,d.nombre',[$id]);
+	return \Response::json($depositos_saldo, 200);
+
+});
+
+Route::get('/producto_lotes_saldo/{id_producto}/{id_deposito}', function ($id_producto,$id_deposito) {
+
+	$depositos_saldo= DB::select('select mp.id as id_lote,mp.numero,sum(cantidad) as cantidad from lotes_mp mp, movimientos m,depositos d where d.id=? and mp.productos_id=? and mp.id=m.lotes_mp_id and m.depositos_id=d.id group by mp.id,mp.numero having sum(cantidad)>0',[$id_deposito,$id_producto]);
+	return \Response::json($depositos_saldo, 200);
+
+});
+
+
+
+
+///////////////////////SALDOS //////////////////
+
+Route::get('/stock_seleccion_deposito', function () {
+	$depositos = DB::select("select * from depositos where visible=true");
+    return view('stock_seleccion_deposito',['depositos'=>$depositos]);
+})->name('stock_seleccion_deposito');
+
+
+Route::post('/stock_seleccion_deposito', function () {
+	$deposito=DB::select("select * from depositos where id=?",[$_POST['dep']]);
+	$deposito=$deposito[0];
+	$saldos= DB::select("select * from saldos,productos WHERE id_deposito=? and id_producto=productos.id",[$_POST['dep']]);
+		return view('stock_deposito',['deposito'=>$deposito,'saldos'=>$saldos]);	
+})->name('stock_deposito');
+
+
+
+Route::get('/stock_deposito', function ($id) {
+    return view('stock_deposito');
+})->name('stock_deposito');

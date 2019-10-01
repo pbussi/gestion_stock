@@ -41,6 +41,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapWebRoutesProductos();
         $this->mapWebRoutesDepositos();
         $this->mapWebRoutesMovimientosMp();
+        $this->mapWebRoutesProduccion();
 
         //
     }
@@ -99,6 +100,20 @@ class RouteServiceProvider extends ServiceProvider
         Route::middleware('web')
              ->namespace($this->namespace)
              ->group(base_path('routes/movimientos_mp.php'));
+    }
+
+     /**
+     * Define the "web" routes for the application.
+     *
+     * These routes all receive session state, CSRF protection, etc.
+     *
+     * @return void
+     */
+    protected function mapWebRoutesProduccion()
+    {
+        Route::middleware('web')
+             ->namespace($this->namespace)
+             ->group(base_path('routes/produccion.php'));
     }
 
     /**

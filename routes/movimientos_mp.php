@@ -69,8 +69,8 @@ Route::get('/movimiento_mp_salida/{id}', function ($id) {
 	if (count($saldos)==0) 
 		return redirect()->route('movimiento_mp_salida_seleccion')->with('error','Producto sin stock!');	
 
-	$depositos = DB::select('select * from depositos where visible=true');
-    return view('movimiento_mp_salida',['producto' => $producto,'saldos' => $saldos,]);
+	$destinos = DB::select('select * from depositos');
+    return view('movimiento_mp_salida',['producto' => $producto,'saldos' => $saldos, 'destinos'=>$destinos]);
 })->name('movimiento_mp_salida');
 
 
@@ -87,6 +87,8 @@ Route::post('/movimiento_mp_salida', function () {
 
 		//grabo el movimiento de salida
 		$mov=DB::select('insert into movimientos values (NULL,?,?,?,?,?,?,?)',[$_POST['fecha_movimiento'],-$_POST['movimiento_cantidad'],$id_deposito,$_POST['movimientos_observaciones'],$id_lote,NULL,$_POST['movimiento_comprobante_asociado']]);
+
+		DB::select('insert into movimientos values (NULL,?,?,?,?,?,?,?)',[$_POST['fecha_movimiento'],$_POST['movimiento_cantidad'],$_POST['destino'],$_POST['movimientos_observaciones'],$id_lote,NULL,$_POST['movimiento_comprobante_asociado']]);
 		return redirect()->route('movimiento_mp_salida_seleccion')->with('success','Movimiento de Salida registrado correctamente!');
 
 	} else {

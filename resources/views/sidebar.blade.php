@@ -44,6 +44,7 @@
             <a class="collapse-item" href="{{ url('/movimiento_mp_salida_seleccion') }}">Egresos de Insumos</a>
             <a class="collapse-item" href="buttons.html">Ingresos de Productos</a>
             <h6 class="collapse-header">Informes</h6>
+            <a class="collapse-item" href="cards.html">Tracking de Lotes de productos</a>
             <a class="collapse-item" href="cards.html">Stock a fecha</a>
             <a class="collapse-item" href="cards.html">Stock por deposito</a>
             <a class="collapse-item" href="cards.html">Stock por agrupacion</a>
@@ -89,8 +90,7 @@
         </a>
         <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
-            <h6 class="collapse-header">Login Screens:</h6>
-            <a class="collapse-item" href="login.html">Login</a>
+            <a class="collapse-item" href="login.html">Lotes</a>
             <a class="collapse-item" href="register.html">Register</a>
             <a class="collapse-item" href="forgot-password.html">Forgot Password</a>
             <div class="collapse-divider"></div>
