@@ -64,11 +64,7 @@
           </div>   
      </div>
       <div class="form-group row"> 
-          <div class="col-sm-3 mb-3 mb-sm-0">           
-                  <label for="movie
-                  ">Comprobante asociado</label>
-                  <input class="form-control" type="text" placeholder="" name=movimiento_comprobante_asociado>
-          </div>
+
           <div class="col-sm-5 mb-3 mb-sm-0"> 
                 <label for="stkmax">Observaciones</label>
                 <input class="form-control" type="textarea" placeholder=""  name=movimientos_observaciones>

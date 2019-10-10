@@ -7,7 +7,7 @@
           <!-- DataTales Example -->
           <div class="card shadow mb-4">
             <div class="card-header py-3">
-              <h6 class="m-0 font-weight-bold text-primary">Egreso de MP</h6>
+              <h6 class="m-0 font-weight-bold text-primary">Transferencia entre Depositos de Insumos y Materias Primas </h6>
             </div>
             <div class="card-body">
  <form class="user" action="{{ url('/movimiento_mp_salida_seleccion') }}" id=movimiento_mp_salida_seleccion method=POST>

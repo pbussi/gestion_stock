@@ -14,16 +14,16 @@
       @csrf
         <input type=hidden name=id value="{{$producto->id}}">
         <div class="form-group row">
-            <div class="col-sm-2 mb-3 mb-sm-0">
+            <div class="col-sm-3 mb-3 mb-sm-0">
                <label for="fecha_mov">Fecha de Ingreso</label>
-              <input class="form-control" type="date" name=fecha_movimiento value="{{ date('Y-m-d') }}">
+              <input class="form-control" type="date" name=fecha_movimiento value="{{ date('d-m-Y') }}">
             </div>
 
         </div>
 
           <div class="form-group row">
 
-            <div class="col-sm-4 mb-3 mb-sm-0">
+            <div class="col-sm-3 mb-3 mb-sm-0">
               <label for="lote_numero">Numero de Lote</label>
               <input class="form-control" type="text" name=lote_numero>
             </div>
@@ -33,7 +33,7 @@
             </div>
             <div class="col-sm-3 mb-3 mb-sm-0">
                 <label for="movimiento_cantidad">Cantidad</label>
-               <input class="form-control text-primary" type="text" name=movimiento_cantidad style="font-weight: bold; >
+               <input class="form-control text-primary" type="text" name=movimiento_cantidad style="font-weight: bold; ">
             </div>
              <div class="col-sm-2 mb-3 mb-sm-0">
                 <label for="unidad_medida">Unidad de Medida</label>   
@@ -50,13 +50,7 @@
                 @endforeach
               </select>
               </div>
-          </div>
-          <div class="form-group row"> 
-              <div class="col-sm-6 mb-3 mb-sm-0">           
-                  <label for="movie
-                  ">Comprobante asociado</label>
-                  <input class="form-control" type="text" placeholder="" name=movimiento_comprobante_asociado>
-              </div>
+
                <div class="col-sm-6 mb-3 mb-sm-0"> 
                 <label for="stkmax">Observaciones</label>
                 <input class="form-control" type="text" placeholder=""  name=movimientos_observaciones>

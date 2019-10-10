@@ -6,7 +6,7 @@
         <div class="sidebar-brand-icon rotate-n-15">
           <i class="fas fa-ice-cream"></i>
         </div>
-        <div class="sidebar-brand-text mx-3">Helados RINCON</div>
+        <div class="sidebar-brand-text mx-3"><img src="/proyecto/gestion_stock/public/images/logo_rincon.png" width="150px"></div>
       </a>
 
       <!-- Divider -->
@@ -40,13 +40,13 @@
             <a class="collapse-item" href="{{ url('/productos') }}">Productos</a>
             <a class="collapse-item" href="{{ url('/depositos') }}">Depositos</a>
             <h6 class="collapse-header">Movimientos:</h6>
-            <a class="collapse-item" href="{{ url('/movimiento_mp_ingreso_seleccion') }}">Ingresos de Insumos</a>
-            <a class="collapse-item" href="{{ url('/movimiento_mp_salida_seleccion') }}">Egresos de Insumos</a>
-            <a class="collapse-item" href="buttons.html">Ingresos de Productos</a>
+            <a class="collapse-item" href="{{ url('/movimiento_mp_ingreso_seleccion') }}">Ingresos Insumos</a>
+            <a class="collapse-item" href="{{ url('/movimiento_mp_salida_seleccion') }}">Transferencia Insumos</a>
+            <a class="collapse-item" href="{{url('/movimiento_descarte_seleccion')}}">Salida Insumos</a>
             <h6 class="collapse-header">Informes</h6>
             <a class="collapse-item" href="cards.html">Tracking de Lotes de productos</a>
             <a class="collapse-item" href="cards.html">Stock a fecha</a>
-            <a class="collapse-item" href="cards.html">Stock por deposito</a>
+            <a class="collapse-item" href={{ url('/stock_seleccion_deposito') }}>Stock por deposito</a>
             <a class="collapse-item" href="cards.html">Stock por agrupacion</a>
           
            <h6 class="collapse-header">Valorizacion</h6>
@@ -90,13 +90,9 @@
         </a>
         <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
-            <a class="collapse-item" href="login.html">Lotes</a>
-            <a class="collapse-item" href="register.html">Register</a>
-            <a class="collapse-item" href="forgot-password.html">Forgot Password</a>
-            <div class="collapse-divider"></div>
-            <h6 class="collapse-header">Other Pages:</h6>
-            <a class="collapse-item" href="404.html">404 Page</a>
-            <a class="collapse-item" href="blank.html">Blank Page</a>
+            <a class="collapse-item" href={{ url('/lotes_produccion') }}>Lotes</a>
+           
+          
           </div>
         </div>
       </li>

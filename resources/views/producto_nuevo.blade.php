@@ -60,7 +60,7 @@
             </div>
           <div class="form-group row"> 
             <div class="col-sm-4 mb-3 mb-sm-0">
-             <input class="form-control" type="text" placeholder="Precio de Costo" name=precio_costo>
+             <input class="form-control" type="text" pattern="^\$\d{1,3}(,\d{3})*(\.\d+)?$" value="" data-type="currency" placeholder="Precio de Costo" name=precio_costo>
          </div>
        </div>
         <div class="form-group row"> 

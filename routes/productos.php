@@ -5,6 +5,50 @@ Route::get('/productos', function () {
     return view('productos', ['productos' => $productos]);
 })->name('productos');
 
+Route::get('/productos_saldos_pdf', function () {
+	$productos = DB::select("select p.id as pid,p.nombre as producto,d.id as did,d.nombre as deposito,sum(cantidad) as saldo from productos p,lotes_mp l,movimientos m,depositos d where d.id=m.depositos_id and m.lotes_mp_id=l.id and l.productos_id=p.id and p.lleva_stock=1 and d.id<>13 group by p.id,p.nombre,d.id,d.nombre ");
+	$depositos = DB::select("select * from depositos where id<>13");
+	$matriz=array();
+	foreach ($productos as $p) {
+		$matriz[$p->pid]['nombre']=$p->producto;
+		$matriz[$p->pid][$p->did]=$p->saldo;
+		if (isset($matriz[$p->pid]['total'])) $matriz[$p->pid]['total']+=$p->saldo; 
+		else 
+				$matriz[$p->pid]['total']=$p->saldo;
+		
+	}
+	
+    require('mc_table.php');
+	$pdf=new PDF_MC_Table();
+	$pdf->AddPage();
+	$pdf->SetFont('Arial','',12);
+	$pdf->Write(5,"Listado de productos y saldos.  Fecha:".date("d/m/Y",time()));
+
+	$pdf->Ln();
+	$pdf->Ln();
+	$pdf->SetFont('Arial','',10);
+	$cols=array(70);$titulos=array("");$aligns=array("L");
+	foreach ($depositos as $d){
+		$cols[]=30;$titulos[]=$d->nombre;$aligns[]="R";
+	}
+	$cols[]=30;$titulos[]="Total";$aligns[]="R";	
+
+	$pdf->SetWidths($cols);$pdf->SetAligns($aligns);
+	$pdf->Row($titulos);
+
+	foreach($matriz as $m){
+		$row=array($m['nombre']);
+		foreach ($depositos as $d){
+			if (isset($m[$d->id])) $row[]=$m[$d->id]; else $row[]="0.00";
+		}
+		$row[]=$m['total'];
+
+	    $pdf->Row($row);
+	}
+	$pdf->Output("D","reporte_saldos.pdf");
+})->name('productos_saldos_pdf');
+
+
 Route::get('/producto_nuevo', function () {
 	$tipos_producto = DB::select('select * from tipo_producto');
     return view('producto_nuevo',['tipos_producto' => $tipos_producto]);
@@ -84,6 +128,63 @@ Route::post('/stock_seleccion_deposito', function () {
 
 
 
+
+
+Route::get('/stock_seleccion_deposito_pdf/{id}', function ($id) {
+	$prodsxdep = DB::select("select s.id_producto,s.id_deposito,s.cantidad, p.nombre, p.marca, p.unidad_medida, d.nombre as deposito from saldos s, productos p, depositos d WHERE s.id_deposito=? and s.id_deposito=d.id and s.id_producto=p.id and s.cantidad<>0; ",[$id]);
+	$deposito=DB::select("select * from depositos where id=?",[$id]);
+	$deposito=$deposito[0];
+
+	$matriz=array();
+	foreach ($prodsxdep as $p) {
+		$matriz[$p->id_producto]['nombre']=$p->nombre;
+		$matriz[$p->id_producto]['marca']=$p->marca;
+		$matriz[$p->id_producto]['unidad_medida']=$p->unidad_medida;
+		$matriz[$p->id_producto]['saldo']=$p->cantidad;		
+	}
+	
+    require('mc_table.php');
+	$pdf=new PDF_MC_Table();
+	$pdf->AddPage();
+	$pdf->Image('images/rincon.jpeg',180,6,15,15);
+	$pdf->SetFont('Arial','B',12);
+	$pdf->Write(5,"Stock de Productos en ".$deposito->nombre);
+	$pdf->Ln();
+	$pdf->SetFont('Arial','',11);
+	$pdf->Write(5,"Fecha:".date("d/m/Y",time()));
+	$pdf->Ln();
+	$pdf->Ln();
+	$pdf->SetFont('Arial','',10);
+	$cols=array();$aligns=array();
+	$cols[]=70;$titulos[]="Producto";$aligns[]="L";
+	$cols[]=30;$titulos[]="Marca";$aligns[]="L";
+	$cols[]=30;$titulos[]="U.M.";$aligns[]="C";
+	$cols[]=30;$titulos[]="Saldos";$aligns[]="R";
+
+	$pdf->SetWidths($cols);$pdf->SetAligns($aligns);
+	$pdf->Row($titulos);
+
+	foreach($matriz as $m){
+
+		$row=array($m['nombre']);
+		$row[]=$m['marca'];
+		$row[]=$m['unidad_medida'];
+		$row[]=$m['saldo'];
+	
+	    $pdf->Row($row);
+	}
+	$pdf->Output("D","saldo_deposito.pdf");	
+
+})->name('stock_seleccion_deposito_pdf');
+
+
+
+
+
+
+
 Route::get('/stock_deposito', function ($id) {
     return view('stock_deposito');
 })->name('stock_deposito');
+
+

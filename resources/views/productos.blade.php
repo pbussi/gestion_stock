@@ -9,12 +9,19 @@
           <div class="card shadow mb-4">
             <div class="card-header py-3">
               <h6 class="m-0 font-weight-bold text-primary">Productos
+                 <a href="{{ url('/productos_saldos_pdf') }}"  class=" btn btn-warning btn-icon-split float-right" style="margin-left: 10px;">
+                    <span class="icon text-white-50">
+                      <i class="fas fa-print"></i>
+                    </span>
+                    <span class="text">Saldos</span>
+                  </a>
               <a href="{{ url('/producto_nuevo') }}"  class=" btn btn-success btn-icon-split float-right">
                     <span class="icon text-white-50">
                       <i class="fas fa-check-double"></i>
                     </span>
                     <span class="text">Crear nuevo Producto</span>
                   </a>
+                 
            </h6>
             </div>
             <div class="card-body">
