@@ -10,55 +10,22 @@
     <p class="mb-4">Gestion de ingredientes de la produccion</p>
       <div class="card shadow mb-4">
         <div class="card-header py-3">
-          <h6 class="m-0  text-primary"> Fecha:  {{ $lote->fecha }} </h6>
+          <h6 class="m-0  text-primary"> Fecha:  <?php echo date('d/m/Y', strtotime($lote->fecha)); ?></h6>
+           
         </div>
-      </div>      
-        <div class=row>
-          
-            <div class="col-xl-3 col-md-6 mb-3">
-              <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                  <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Temp. Pasteurizacion</div>
-                      <div class="h6 mb-0 font-weight-bold text-gray-800">{{$lote->pasteurizacion_temperatura}}°C</div>
-                    </div> 
-                  </div>
-                </div>
-              </div>
-            </div>
-
-
-          <div class="col-xl-3 col-md-6 mb-3">
-              <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
-                  <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Tiempo Pasteurizacion</div>
-                      <div class="h7 mb-0 font-weight-bold text-gray-800">{{$lote->pasteurizacion_tiempo}}°C</div>
-                    </div> 
-                  </div>
-                </div>
-              </div>
-            </div>
-
-             <div class="col-xl-5 col-md-6 mb-3">
-              <div class="card border-left-warning shadow h-100 py-2">
-                <div class="card-body">
-                  <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Observaciones</div>
-                      <div class="small mb-0 text-gray-800">{{$lote->observaciones}}</div>
-                    </div> 
-                  </div>
-                </div>
-              </div>
-            </div>
-
-    </div>
-
-
-          
+      </div>
+    <ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a class="nav-link active" href="{{ url('/lotes_produccion_gestion',$lote->id) }}">Insumos utilizados</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="{{ url('/lotes_produccion_gestion_terminados',$lote->id) }}">Productos terminados</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="{{ url('/lotes_produccion_gestion_info',$lote->id) }}">Información del Lote</a>
+  </li>
+  
+</ul>  
         <div class="card-body">
          <div class="table-responsive">
           <table class="table table-bordered small" id="xxdataTable" width="100%" cellspacing="0">
@@ -67,9 +34,11 @@
               <th scope="col">Ingrediente</th>
               <th scope="col">Marca</th>
               <th scope="col">Lote</th>
-              <th scope="col">Unidad de Medida</th>
+              <th scope="col">U.M.</th>
               <th scope="col">Cantidad</th>
-              <th scope="col">Accion</th>
+              <th scope="col"></th>
+              <th scope="col" style="width: 20%;">Asignar</th>
+                <th scope="col"></th>
             </tr>
           </thead>
        <tbody>
@@ -81,9 +50,36 @@
             <td>{{ $i->unidad_medida}}</td>
             <td>{{ $i->cantidad}}</td>
             <td class="w-10"> 
+              @if ($lote->estado==1)
               <a href="{{ url('/lotes_produccion_gestion',$lote->id) }}?borrar={{ $i->movimiento_id}}" class="float-left">
               <span class="icon"><i class="fas fa-trash"></i></span></a>
+              @endif
             </td>
+               <td> 
+                <div >
+                
+                <select name=terminado id="terminado_{{$i->lp_id}}" class="float-left"
+
+                   @if ($lote->estado==0) disabled @endif>
+                <option    value=0 >Asignar a</option>
+               @foreach ($terminados as $p)
+                <option value={{$p->pt_id}} 
+                @if ($p->pt_id==$i->id_lote_prod_terminado)
+                  selected
+                @endif
+                  ><?php echo ucwords(strtolower($p->nombre)); ?>
+                </option>
+              @endforeach
+            </select>
+           
+              <td> 
+                 @if ($lote->estado==1)
+                    <a id="icon2_{{$i->lp_id}}" class="float-left"  onClick="window.location.href='{{ url('/lotes_produccion_gestion',$lote->id) }}?asignar_mp={{ $i->lp_id}}&p_l_p='+$('#terminado_{{$i->lp_id}} option:selected').attr('value') " class="float-left" style="float:right;"><span class="float-left icon"><i class="far fa-thumbs-up"></i></span></a>
+                 @endif  
+              </td>
+
+
+          </div></td>
           </tr>
         @endforeach
       </tbody>
@@ -100,17 +96,18 @@
         <div class="col-sm-3 mb-3 mb-sm-0">
           <label for="lote_numero">Producto</label>
              <select class="form-control"  name=producto id=producto>
+               <option value=0 >Elija producto</option>
                @foreach ($productos as $p)
-                <option value={{$p->id}}>{{$p->nombre}}-{{$p->marca}}</option>
+                <option value={{$p->id}} stock={{$p->lleva_stock}}>{{$p->nombre}}-{{$p->marca}}</option>
               @endforeach
             </select>
         </div>
         <div class="col-sm-3">
-          <label for="lote_numero">Deposito</label>
+          <label for="lote_numero" id=ldeposito>Deposito</label>
             <select class="form-control"  name=deposito id=deposito></select>
         </div>
         <div class="col-sm-3 mb-3 mb-sm-0">
-          <label for="lote_numero">Lote del ingrediente</label>
+          <label for="lote_numero" id=llote>Lote del ingrediente</label>
             <select class="form-control"  name=lote id=lote></select>
         </div>
         <div class="col-sm-1 mb-3 mb-sm-0">
@@ -120,7 +117,19 @@
         <div class="col-sm-1 mb-3 mb-sm-0">
           <label for="unidad_medida"></label>
             <a href="#"  onclick="
-if (parseFloat($('#lote option:selected')[0].attributes.cantidad.value)>=parseFloat($('#cantidad').val()))             document.getElementById('nuevo_lote').submit(); else alert('Complete todos los datos');" class="btn btn-success btn-icon-split" style="margin-top: 7px;">
+                  if (!(parseFloat($('#cantidad').val())>0)){
+                    alert('Ingrese cantidad');
+                    return;
+                  }
+                  if ($('#producto option:selected').attr('stock')=='0'){
+                    document.getElementById('nuevo_lote').submit(); 
+                  }
+
+                  if (parseFloat($('#lote option:selected')[0].attributes.cantidad.value)>=parseFloat($('#cantidad').val()))             
+                    document.getElementById('nuevo_lote').submit(); 
+                  else alert('Stock insuficiente');" 
+
+                  class="btn btn-success btn-icon-split" style="margin-top: 7px;">
             <span class ="icon text-white-50">
                 <i class="fas fa-check-double"></i>
             </span>
@@ -135,6 +144,18 @@ if (parseFloat($('#lote option:selected')[0].attributes.cantidad.value)>=parseFl
 
 
       $( "#producto" ).change(function() {
+        if ( $("#producto option:selected").attr('stock')=="0"){
+            $('#deposito').hide();
+            $('#lote').hide();
+            $('#ldeposito').hide();
+            $('#llote').hide();
+            return;
+        }
+        $('#deposito').show();
+        $('#lote').show();
+        $('#ldeposito').show();
+        $('#llote').show();
+        console.log(this);
         let dropdown = $('#deposito');
         let dropdown2 = $('#lote');
         dropdown.empty();

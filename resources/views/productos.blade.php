@@ -3,13 +3,13 @@
 @section('content')
         <div class="container-fluid">
           <!-- Page Heading -->
-          <h1 class="h3 mb-2 text-gray-800">Catalogo de productos</h1>
-          <p class="mb-4">Listas de productos manejados por el sistema</p>
+          <h1 class="h3 mb-2 text-gray-800">{{$titulos[0]}}</h1>
+          <p class="mb-4">{{$titulos[1]}}</p>
           <!-- DataTales Example -->
           <div class="card shadow mb-4">
             <div class="card-header py-3">
-              <h6 class="m-0 font-weight-bold text-primary">Productos
-                 <a href="{{ url('/productos_saldos_pdf') }}"  class=" btn btn-warning btn-icon-split float-right" style="margin-left: 10px;">
+              <h6 class="m-0 font-weight-bold text-primary">{{$titulos[2]}}
+<a href="{{ url('/productos_saldos_pdf') }}?tipo=<?php echo Request::path(); ?>" class=" btn btn-warning btn-icon-split float-right" style="margin-left: 10px;">
                     <span class="icon text-white-50">
                       <i class="fas fa-print"></i>
                     </span>
@@ -19,7 +19,7 @@
                     <span class="icon text-white-50">
                       <i class="fas fa-check-double"></i>
                     </span>
-                    <span class="text">Crear nuevo Producto</span>
+                    <span class="text">Crear nuevo</span>
                   </a>
                  
            </h6>

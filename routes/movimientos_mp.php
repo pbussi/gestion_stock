@@ -63,9 +63,9 @@ Route::get('/movimiento_mp_salida/{id}', function ($id) {
 	$productos = DB::select('select * from productos where id=?',[$id]);
 	$producto=$productos[0];
 
-	$saldos = DB::select('SELECT d.id as id_deposito,d.nombre as nombre_deposito,l.id as id_lote,l.numero as numero_lote,sum(cantidad) as saldo 
-		FROM movimientos m,lotes_mp l,depositos d 
-		WHERE m.lotes_mp_id=l.id and m.depositos_id=d.id and d.id<>13 and l.productos_id=? group by d.id,d.nombre,l.id,l.numero having sum(cantidad)>0',[$id]);
+	$saldos = DB::select('SELECT d.id as id_deposito,d.nombre as nombre_deposito,lotes_mp_id as id_lote_mp,productos_lote_produccion_id as id_lote_produccion_id,lote as numero_lote,sum(cantidad) as saldo 
+		FROM vista_movimientos m,depositos d 
+		WHERE  m.depositos_id=d.id and d.id<>13 and productos_id=? group by d.id,d.nombre,lotes_mp_id,productos_lote_produccion_id,lote having sum(cantidad)>0',[$id]);
 
 	if (count($saldos)==0) 
 		return redirect()->route('movimiento_mp_salida_seleccion')->with('error','Producto sin stock!');	
@@ -78,15 +78,26 @@ Route::get('/movimiento_mp_salida/{id}', function ($id) {
 
 Route::post('/movimiento_mp_salida', function () {
 	$seleccion = explode("-",$_POST['stock_deposito']);
-	$id_lote=$seleccion[0];
-	$id_deposito=$seleccion[1];
-	$saldo_actual=$seleccion[2];
+	$id_lote_mp=$seleccion[0];
+	$id_lote_prod=$seleccion[1];
+	$id_deposito=$seleccion[2];
+	$saldo_actual=$seleccion[3];
 	if($_POST['movimiento_cantidad']<=$saldo_actual){
 		$comprobante=talonarioSiguiente("TRANSF");
 		//grabo el movimiento de salida
-		$mov=DB::select('insert into movimientos values (NULL,?,?,?,?,?,?,?)',[$_POST['fecha_movimiento'],-$_POST['movimiento_cantidad'],$id_deposito,$_POST['movimientos_observaciones'],$id_lote,NULL,$comprobante]);
 
-		DB::select('insert into movimientos values (NULL,?,?,?,?,?,?,?)',[$_POST['fecha_movimiento'],$_POST['movimiento_cantidad'],$_POST['destino'],$_POST['movimientos_observaciones'],$id_lote,NULL,$comprobante]);
+		// si el movimiento es de un lote de materia prima uso el primer id
+		if ($id_lote_mp>0){
+		$mov=DB::select('insert into movimientos values (NULL,?,?,?,?,?,?,?)',[$_POST['fecha_movimiento'],-$_POST['movimiento_cantidad'],$id_deposito,$_POST['movimientos_observaciones'],$id_lote_mp,NULL,$comprobante]);
+		DB::select('insert into movimientos values (NULL,?,?,?,?,?,?,?)',[$_POST['fecha_movimiento'],$_POST['movimiento_cantidad'],$_POST['destino'],$_POST['movimientos_observaciones'],$id_lote_mp,NULL,$comprobante]);
+		}else{
+			// se recibe el id del producto que pertenece a un lote
+			DB::select('insert into movimientos values (NULL,?,?,?,?,?,?,?)',[$_POST['fecha_movimiento'],-$_POST['movimiento_cantidad'],$id_deposito,$_POST['movimientos_observaciones'],NULL,$id_lote_prod,$comprobante]);
+			DB::select('insert into movimientos values (NULL,?,?,?,?,?,?,?)',[$_POST['fecha_movimiento'],$_POST['movimiento_cantidad'],$_POST['destino'],$_POST['movimientos_observaciones'],NULL,$id_lote_prod,$comprobante]);
+
+		}
+
+
 		return redirect()->route('movimiento_mp_salida_seleccion')->with('success','Movimiento de Salida registrado correctamente!');
 
 	} else {
@@ -103,23 +114,20 @@ Route::get('/movimiento_producto/{id}', function ($id) {
 	$producto=$productos[0];
 	
 
-	$movs = DB::select('SELECT m.*, d.nombre as deposito, l.numero as lote, l.vencimiento as vencimiento FROM movimientos m, lotes_mp l, depositos d where m.lotes_mp_id=l.id and d.id<>13 and l.productos_id=? and m.depositos_id=d.id order by fecha asc;',[$id]);
-
+	$movs = DB::select("select * from vista_movimientos where productos_id=? order by fecha asc,id asc;",[$id]);
 
 	$movimientos=array();
 	foreach ($movs as $mov) {
 		$movimientos[$mov->deposito][]=$mov;
 	}
 
-	$saldoxdep=DB::select('select m.depositos_id as dep, sum(cantidad) as saldo from movimientos m, lotes_mp l where l.id=m.lotes_mp_id and l.productos_id=? group by m.depositos_id',[$id]);
+	$saldoxdep=DB::select('select depositos_id as dep, sum(cantidad) as saldo from vista_movimientos where productos_id=? group by depositos_id',[$id]);
 	
-
 	$saldodeposito=array();
 	foreach($saldoxdep as $s){
 		$saldodeposito[$s->dep]['saldo']=$s->saldo;
 	}
 	
-
     return view('movimiento_producto',['producto' => $producto,'saldosxdep'=>$saldodeposito,'movimientos' => $movimientos,'saldos'=>array()]);
 })->name('movimiento_[producto]');
 
@@ -151,10 +159,9 @@ Route::get('/movimiento_descarte/{id}', function ($id) {
 	$productos = DB::select('select * from productos where id=?',[$id]);
 	$producto=$productos[0];
 
-	$saldos = DB::select('SELECT d.id as id_deposito,d.nombre as nombre_deposito,l.id as id_lote,l.numero as numero_lote,sum(cantidad) as saldo 
-		FROM movimientos m,lotes_mp l,depositos d 
-		WHERE m.lotes_mp_id=l.id and m.depositos_id=d.id and d.id<>13 and l.productos_id=? group by d.id,d.nombre,l.id,l.numero having sum(cantidad)>0',[$id]);
-
+	$saldos = DB::select('SELECT d.id as id_deposito,d.nombre as nombre_deposito,lotes_mp_id as id_lote_mp,productos_lote_produccion_id as id_lote_produccion_id,lote as numero_lote,sum(cantidad) as saldo 
+		FROM vista_movimientos m,depositos d 
+		WHERE  m.depositos_id=d.id and d.id<>13 and productos_id=? group by d.id,d.nombre,lotes_mp_id,productos_lote_produccion_id,lote having sum(cantidad)>0',[$id]);
 	if (count($saldos)==0) 
 		return redirect()->route('movimiento_descarte_seleccion')->with('error','Producto sin stock!');	
 	return view('movimiento_descarte',['producto' => $producto,'saldos' => $saldos]);
@@ -163,16 +170,19 @@ Route::get('/movimiento_descarte/{id}', function ($id) {
 
 
 Route::post('/movimiento_descarte', function () {
-	$deposito_descarte=13;
 	$seleccion = explode("-",$_POST['stock_deposito']);
-	$id_lote=$seleccion[0];
-	$id_deposito=$seleccion[1];
-	$saldo_actual=$seleccion[2];
+	$id_lote_mp=$seleccion[0];
+	$id_lote_prod=$seleccion[1];
+	$id_deposito=$seleccion[2];
+	$saldo_actual=$seleccion[3];
 	if($_POST['movimiento_cantidad']<=$saldo_actual){
 		$comprobante=talonarioSiguiente("EGR");
 		//grabo el movimiento de salida
-		$mov=DB::select('insert into movimientos values (NULL,?,?,?,?,?,?,?)',[$_POST['fecha_movimiento'],-$_POST['movimiento_cantidad'],$id_deposito,$_POST['movimientos_observaciones'],$id_lote,NULL,$comprobante]);
-
+		if ($id_lote_mp>0){
+			$mov=DB::select('insert into movimientos values (NULL,?,?,?,?,?,?,?)',[$_POST['fecha_movimiento'],-$_POST['movimiento_cantidad'],$id_deposito,$_POST['movimientos_observaciones'],$id_lote_mp,NULL,$comprobante]);
+		}else{
+			$mov=DB::select('insert into movimientos values (NULL,?,?,?,?,?,?,?)',[$_POST['fecha_movimiento'],-$_POST['movimiento_cantidad'],$id_deposito,$_POST['movimientos_observaciones'],NULL,$id_lote_prod,$comprobante]);
+		}
 		
 		return redirect()->route('movimiento_descarte_seleccion')->with('success','El producto ha sido eliminado correctamente!');
 

@@ -1,12 +1,25 @@
 <?php
 
 Route::get('/productos', function () {
-	$productos = DB::select('select productos.*,tipo_producto.nombre as tipo_nombre from productos,tipo_producto where productos.tipo_producto_id=tipo_producto.id');
-    return view('productos', ['productos' => $productos]);
+	$productos = DB::select('select productos.*,tipo_producto.nombre as tipo_nombre from productos,tipo_producto where productos.tipo_producto_id=tipo_producto.id and tipo_producto_id not in (4,7)');
+	$titulos=array("Catalogo de productos","Listado de sabores y productos de fabricación propia","Productos Terminados");
+    return view('productos', ['productos' => $productos,'titulos'=>$titulos]);
 })->name('productos');
 
+
+Route::get('/insumos', function () {
+	$productos = DB::select('select productos.*,tipo_producto.nombre as tipo_nombre from productos,tipo_producto where productos.tipo_producto_id=tipo_producto.id and tipo_producto_id in (4,7)');
+	$titulos=array("Insumos y Materias Primas","Listado de componentes para la fabricación","Insumos y Materias Primas");
+    return view('productos', ['productos' => $productos,'titulos'=>$titulos]);
+})->name('productos');
+
+
+
+
 Route::get('/productos_saldos_pdf', function () {
-	$productos = DB::select("select p.id as pid,p.nombre as producto,d.id as did,d.nombre as deposito,sum(cantidad) as saldo from productos p,lotes_mp l,movimientos m,depositos d where d.id=m.depositos_id and m.lotes_mp_id=l.id and l.productos_id=p.id and p.lleva_stock=1 and d.id<>13 group by p.id,p.nombre,d.id,d.nombre ");
+	if ($_GET['tipo']=="insumos") $conjunto="tipo_producto_id in (4,7)";
+	else $conjunto="tipo_producto_id not in (4,7)";
+	$productos = DB::select("select p.id as pid,p.nombre as producto,d.id as did,d.nombre as deposito,sum(cantidad) as saldo from productos p,lotes_mp l,movimientos m,depositos d where $conjunto and d.id=m.depositos_id and m.lotes_mp_id=l.id and l.productos_id=p.id and p.lleva_stock=1 and d.id<>13 group by p.id,p.nombre,d.id,d.nombre ");
 	$depositos = DB::select("select * from depositos where id<>13");
 	$matriz=array();
 	foreach ($productos as $p) {
@@ -22,8 +35,10 @@ Route::get('/productos_saldos_pdf', function () {
 	$pdf=new PDF_MC_Table();
 	$pdf->AddPage();
 	$pdf->SetFont('Arial','',12);
-	$pdf->Write(5,"Listado de productos y saldos.  Fecha:".date("d/m/Y",time()));
-
+	if ($_GET['tipo']=="insumos") 
+		$pdf->Write(5,"Listado de insumos y saldos.  Fecha:".date("d/m/Y",time()));
+	else 
+		$pdf->Write(5,"Listado de productos y saldos.  Fecha:".date("d/m/Y",time()));
 	$pdf->Ln();
 	$pdf->Ln();
 	$pdf->SetFont('Arial','',10);
@@ -96,7 +111,7 @@ Route::post('/producto_edit', function () {
 
 Route::get('/producto_depositos_saldo/{id}', function ($id) {
 
-	$depositos_saldo= DB::select('select d.id as id_deposito,d.nombre,sum(cantidad) from lotes_mp mp, movimientos m,depositos d where mp.productos_id=? and mp.id=m.lotes_mp_id and m.depositos_id=d.id group by d.id,d.nombre',[$id]);
+	$depositos_saldo= DB::select('select d.id as id_deposito,d.nombre,sum(cantidad) from lotes_mp mp, movimientos m,depositos d where mp.productos_id=? and mp.id=m.lotes_mp_id and m.depositos_id=d.id group by d.id,d.nombre  having sum(cantidad)>0',[$id]);
 	return \Response::json($depositos_saldo, 200);
 
 });
@@ -122,7 +137,7 @@ Route::get('/stock_seleccion_deposito', function () {
 Route::post('/stock_seleccion_deposito', function () {
 	$deposito=DB::select("select * from depositos where id=?",[$_POST['dep']]);
 	$deposito=$deposito[0];
-	$saldos= DB::select("select * from saldos,productos WHERE id_deposito=? and id_producto=productos.id",[$_POST['dep']]);
+	$saldos= DB::select("select * from saldos s,productos p WHERE s.id_deposito=? and s.id_producto=p.id",[$_POST['dep']]);
 		return view('stock_deposito',['deposito'=>$deposito,'saldos'=>$saldos]);	
 })->name('stock_deposito');
 
@@ -183,8 +198,11 @@ Route::get('/stock_seleccion_deposito_pdf/{id}', function ($id) {
 
 
 
-Route::get('/stock_deposito', function ($id) {
-    return view('stock_deposito');
-})->name('stock_deposito');
+Route::get('/saldos_a_fecha', function () {
+	
+	$stock = DB::select("select p.nombre, p.marca, p.unidad_medida, s.id_producto, sum(cantidad) as cantidad  from saldos s, productos p where s.id_producto=p.id group by p.nombre, p.marca, p.unidad_medida, s.id_producto;",[]);
+
+    return view('saldos_a_fecha',['stock'=>$stock]);
+})->name('saldos_a_fecha');
 
 

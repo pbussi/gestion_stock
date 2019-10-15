@@ -39,7 +39,7 @@
                   </thead>
                 @foreach ($saldos as $p)
                   <tr>
-                    <td><input type="radio" name=stock_deposito value={{$p->id_lote}}-{{$p->id_deposito}}-{{ $p->saldo }}></td>
+                    <td><input type="radio" name=stock_deposito value={{$p->id_lote_mp}}-{{$p->id_lote_produccion_id}}-{{$p->id_deposito}}-{{ $p->saldo }}></td>
                     <td>{{$p->nombre_deposito}}</td>
                     <td>{{ $p->numero_lote }}</td> 
                     <td class="text-info"> {{ $p->saldo }} {{ $producto->unidad_medida }}</td>
