@@ -14,7 +14,7 @@ Route::get('/lote_produccion_nuevo', function () {
 })->name('lote_produccion_nuevo');
 
 Route::post('/lote_produccion_nuevo', function () {
-    DB::select("insert into lotes_produccion values (NULL,?,?,?,?,1)",[$_POST['fecha_lote'],$_POST['pasteurizacion_temperatura'],$_POST['pasteurizacion_tiempo'],$_POST['observaciones']]);	
+    DB::select("insert into lotes_produccion values (NULL,?,?,?,?,?,1)",[$_POST['fecha_lote'],$_POST['base'],$_POST['pasteurizacion_temperatura'],$_POST['pasteurizacion_tiempo'],$_POST['observaciones']]);	
 	$id = DB::getPdo()->lastInsertId();
 	return redirect()->route('lotes_produccion_gestion',$id)->with('success',"El lote $id se ha creado correctamente.");
 
@@ -30,12 +30,14 @@ Route::get('/lotes_produccion_gestion/{id}', function ($id) {
 		DB::select('delete from mp_lote_produccion where movimiento_id=?',[$_GET['borrar']]);
 		DB::select('delete from movimientos where id=?',[$_GET['borrar']]);
 	}
+	if (isset($_GET['borrar_mp'])){
+		DB::select('delete from mp_lote_produccion where id=?',[$_GET['borrar_mp']]);
+	}
 	if (isset($_GET['asignar_mp'])) {
 		DB::select('update mp_lote_produccion set id_lote_prod_terminado=? 
 			where id=?',[$_GET['p_l_p'],$_GET['asignar_mp']]);
 
 	}
-
 	$lote=DB::select('select * from lotes_produccion where id=?',[$id]);
 	$productos=DB::select('select * from productos');
 	$lote = $lote[0];
@@ -55,9 +57,15 @@ Route::get('/lotes_produccion_gestion_info/{id}', function ($id) {
 	if (isset($_GET['observaciones'])){
 		DB::select('update lotes_produccion set observaciones=?  where id=?',[$_GET['observaciones'],$id]);
 	}
+
+	if (isset($_GET['base'])){
+		DB::select('update lotes_produccion set base=?  where id=?',[$_GET['base'],$id]);
+	}
 	$lote=DB::select('select * from lotes_produccion where id=?',[$id]);
 	$lote = $lote[0];	
-    return view('lotes_produccion_gestion_info', ['lote'=>$lote]);
+	$bases=array("Blanca","Chocolate","Dulce de Leche");
+	
+    return view('lotes_produccion_gestion_info', ['lote'=>$lote, 'bases'=>$bases]);
 })->name('lotes_produccion_gestion_info');
 
 

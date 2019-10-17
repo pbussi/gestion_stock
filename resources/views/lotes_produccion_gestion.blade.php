@@ -10,8 +10,14 @@
     <p class="mb-4">Gestion de ingredientes de la produccion</p>
       <div class="card shadow mb-4">
         <div class="card-header py-3">
-          <h6 class="m-0  text-primary"> Fecha:  <?php echo date('d/m/Y', strtotime($lote->fecha)); ?></h6>
-           
+          <h6 class="m-0  text-primary"> Fecha:  <?php echo date('d/m/Y', strtotime($lote->fecha)); ?>
+           <a href="{{ url('/lotes_produccion_pdf',$lote->id) }}" class=" btn btn-warning btn-icon-split float-right" style="margin-left: 10px;">
+              <span class="icon text-white-50">
+                  <i class="fas fa-print"></i>
+              </span>
+              <span class="text">Imprimir</span>
+            </a>
+          </h6>
         </div>
       </div>
     <ul class="nav nav-tabs">
@@ -51,7 +57,11 @@
             <td>{{ $i->cantidad}}</td>
             <td class="w-10"> 
               @if ($lote->estado==1)
+              @if ($i->movimiento_id>0)
               <a href="{{ url('/lotes_produccion_gestion',$lote->id) }}?borrar={{ $i->movimiento_id}}" class="float-left">
+              @else
+              <a href="{{ url('/lotes_produccion_gestion',$lote->id) }}?borrar_mp={{ $i->lp_id}}" class="float-left">
+              @endif   
               <span class="icon"><i class="fas fa-trash"></i></span></a>
               @endif
             </td>

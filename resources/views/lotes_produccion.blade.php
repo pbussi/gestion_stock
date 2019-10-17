@@ -25,6 +25,7 @@
                     <tr>
                       <th scope="col">Numero</th>
                         <th>Fecha</th>
+                        <th>Base</th>
                         <th>Temperatura Pasteurización</th>
                         <th>Tiempo Pasteurización</th>
                         <th>Estado</th>
@@ -40,6 +41,7 @@
 
                       </a></td>
                       <td class="date">{{date('d-m-Y', strtotime($p->fecha)) }}</td>
+                      <td>{{ $p->base }}</td>     
                       <td>{{ $p->pasteurizacion_temperatura }}</td>
                       <td>{{ $p->pasteurizacion_tiempo }}</td>     
                       <td>

@@ -36,21 +36,21 @@
 
         <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
-            
+            <h5 class="collapse-header">GESTION</h5>
             <a class="collapse-item" href="{{ url('/productos') }}">Productos Terminados</a>
             <a class="collapse-item" href="{{ url('/insumos') }}">Insumos y M. Primas</a>
-            <a class="collapse-item" href="{{ url('/depositos') }}">Depositos</a>
-            <h6 class="collapse-header">Movimientos:</h6>
-            <a class="collapse-item" href="{{ url('/movimiento_mp_ingreso_seleccion') }}">Ingresos Insumos</a>
-            <a class="collapse-item" href="{{ url('/movimiento_mp_salida_seleccion') }}">Transferencia Insumos</a>
-            <a class="collapse-item" href="{{url('/movimiento_descarte_seleccion')}}">Salida Insumos</a>
+             <h5 class="collapse-header">Depositos</h5>
+            <a class="collapse-item" href="{{ url('/depositos') }}">Gestión de Depósitos</a>
+            <h5 class="collapse-header">Movimientos:</h5>
+            <a class="collapse-item" href="{{ url('/movimiento_mp_ingreso_seleccion') }}">Ingresos </a>
+            <a class="collapse-item" href="{{ url('/movimiento_mp_salida_seleccion') }}">Transferencias</a>
+            <a class="collapse-item" href="{{url('/movimiento_descarte_seleccion')}}">Salidas</a>
             <h6 class="collapse-header">Informes</h6>
              <a class="collapse-item" href={{ url('/stock_seleccion_deposito') }}>Stock por deposito</a>
              <a class="collapse-item" href={{ url('/saldos_a_fecha') }}>Stock a fecha</a>
-             <a class="collapse-item" href="cards.html">Stock por agrupacion</a>
-             <a class="collapse-item" href="cards.html">Movimientos de productos</a>
-            <a class="collapse-item" href="cards.html">Tracking de Lotes de productos</a>
-            <a class="collapse-item" href="cards.html">Stock por agrupacion</a>
+             <a class="collapse-item" href={{ url('/stock_por_agrupacion_seleccion')}}>Stock por agrupacion</a>
+           
+          
           
            <h6 class="collapse-header">Valorizacion</h6>
             <a class="collapse-item" href="cards.html">Existencias</a>

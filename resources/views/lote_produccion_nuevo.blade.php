@@ -25,13 +25,28 @@
           </div>    
       </div>
 
+       <div class="form-group row"> 
+              <div class="col-sm-6 mb-3 mb-sm-0">
+                 <label for="tipo_prod">Tipo de Base</label>
+                 <select class="form-control"  name=base>
+                    <option value="Blanca">Base Blanca</option>
+                    <option value="Chocolate">Base Chocolate</option>
+                    <option value="Dulce de leche">Base Dulce de leche</option>
+              </select>
+              </div>
+      </div>
+
+
+
+
+
         <div class="form-group row">
             <div class="col-sm-4 mb-3 mb-sm-0">
                <label for="fecha">Temperatura Pasteurización (°C)</label>
               <input class="form-control" type="number" name=pasteurizacion_temperatura>
             </div>
             <div class="col-sm-3">
-               <label for="fecha">Tiempo Pasteurización (°C)</label>
+               <label for="fecha">Tiempo Pasteurización (Min.)</label>
               <input class="form-control" type="number"  name=pasteurizacion_tiempo>
             </div>          
         </div>

@@ -26,8 +26,26 @@
   </li>
   
 </ul> 
+
+ <div class=row>
+ <div class="col-xl-5 col-md-4 mb-5">
+
+              <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="text-xs font-weight-bold  text-uppercase mb-1">BASE</div>
+                      <div class="h3 mb-0 font-weight-bold text-gray-800">Base {{$lote->base}}</div>
+                         @if ($lote->estado==1)
+                        <i class="fas fa-edit fa-2x text-gray-300 float-right" data-toggle="modal" data-target="#edita_base"></i>
+                        @endif
+                    </div> 
+                  </div>
+                </div>
+              </div>
+            </div>
+</div>
         <div class=row>
-          
             <div class="col-xl-3 col-md-6 mb-3">
               <div class="card border-left-success shadow h-100 py-2">
                 <div class="card-body">
@@ -52,7 +70,7 @@
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                       <div class="text-xs font-weight-bold text-uppercase mb-1 "style="color:#36b9cc;">Tiempo Pasteurizacion</div>
-                      <div class="h7 mb-0 font-weight-bold text-gray-800">{{$lote->pasteurizacion_tiempo}}°C</div>
+                      <div class="h7 mb-0 font-weight-bold text-gray-800">{{$lote->pasteurizacion_tiempo}} Min.</div>
                          @if ($lote->estado==1)
                         <i class="fas fa-edit fa-2x text-gray-300 float-right" data-toggle="modal" data-target="#edita_tiempo_pasteurizacion"></i>
                         @endif
@@ -68,7 +86,7 @@
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                       <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Observaciones</div>
-                      <div class="small mb-0 text-gray-800">{{$lote->observaciones}}</div>
+                      <div class="small mb-0 text-gray-800"><pre>{{$lote->observaciones}}</pre></div>
                        @if ($lote->estado==1)
                         <i class="fas fa-edit fa-2x text-gray-300 float-right" data-toggle="modal" data-target="#edita_observaciones"></i>
                        @endif
@@ -163,6 +181,34 @@
   </div>
 </div>
 
+<!-- Modal -->
+<div class="modal fade" id="edita_base" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Base de Producción</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="{{ url('/lotes_produccion_gestion_info',$lote->id) }}" id=xx method=GET>
+      @csrf
+        <div class="modal-body">
+           <label for="tipo_prod">Tipo de Base</label>
+             <select class="form-control"  name=base>
+                @foreach ($bases as $b)
+                   <option value="{{$b}}"> Base {{$b}}</option>
+                @endforeach
+              </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          <input type="submit" class="btn btn-primary" value=Guardar />
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
 
 @endsection

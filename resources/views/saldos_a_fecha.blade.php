@@ -28,7 +28,7 @@
               <tr>
 
               <th scope="row">{{ $s->id_producto }}</th>
-              <td><a href=""> {{ $s->nombre }}</a></td>
+              <td><a href=""> <b>{{ $s->nombre }}</b></a></td>
                <td>{{ $s->marca}}</td>
               <td>{{ $s->unidad_medida }}</td>
               <td> {{ $s->cantidad }}</td>               

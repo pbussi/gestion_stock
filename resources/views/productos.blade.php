@@ -53,11 +53,11 @@
                         <img src='data:image/JPG;base64,{{base64_encode($p->imagen)}}' width=60px;/>
                         @endif
                       </td>
-                      <td><a href="{{ url('/movimiento_producto',$p->id) }}">{{ $p->nombre }}</a></td>
+                      <td><a href="{{ url('/movimiento_producto',$p->id) }}"><B>{{ $p->nombre }}</B></a></td>
                       <td>{{ $p->marca }}</td>
                       <td>{{ $p->unidad_medida }}</td>
                       <td>{{ $p->tipo_nombre }}</td>
-                      <td>{{ $p->precio_costo }}</td>
+                      <td style="text-align: right;">${{ $p->precio_costo }}</td>
                       <td>
                         @if ($p->lleva_stock === 1)
                         SI
@@ -73,12 +73,13 @@
                         <span class="icon">
                           <i class="fas fa-edit"></i>
                         </span>
-                      </a>
-                      <a href="#" class="float-right">
+                        </a>
+                    {{--
+                        <a href="{{ url('/productos') }}?borrar={{$p->id}}" class="float-left">
                         <span class="icon">
-                          <i class="fas fa-trash"></i>
+                          <i class="fas fa-trash"></i> 
                         </span>
-                      </a>
+                      </a> --}}
                       </td>
                     </tr>
                     @endforeach
