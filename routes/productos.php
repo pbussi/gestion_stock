@@ -3,8 +3,14 @@
 Route::get('/productos', function () {
 	if (isset($_GET['borrar']))
 	{
+		try{
 		DB::select('delete from productos where id=?',[$_GET['borrar']]);
-	}
+		}
+		catch (Exception $e){
+			return redirect()->route('productos')->with('error',"No se puede eliminar el producto seleccionado.  Existen movimientos asociados");
+		}
+	return redirect()->route('productos')->with('success','El producto ha sido eliminado');
+}
 	$productos = DB::select('select productos.*,tipo_producto.nombre as tipo_nombre from productos,tipo_producto where productos.tipo_producto_id=tipo_producto.id and tipo_producto_id not in (4,7)');
 	$titulos=array("Catalogo de productos","Listado de sabores y productos de fabricación propia","Productos para la Venta");
     return view('productos', ['productos' => $productos,'titulos'=>$titulos]);
@@ -207,7 +213,7 @@ Route::get('/stock_seleccion_deposito_pdf/{id}', function ($id) {
 
 Route::get('/saldos_a_fecha', function () {
 	
-	$stock = DB::select("select p.nombre, p.marca, p.unidad_medida, s.id_producto, sum(cantidad) as cantidad  from saldos s, productos p where s.id_producto=p.id group by p.nombre, p.marca, p.unidad_medida, s.id_producto;",[]);
+	$stock = DB::select("select p.nombre, p.marca, p.unidad_medida, s.id_producto, sum(cantidad) as cantidad  from saldos s, productos p where s.id_producto=p.id group by p.nombre, p.marca, p.unidad_medida, s.id_producto order by p.nombre asc;",[]);
 
     return view('saldos_a_fecha',['stock'=>$stock]);
 })->name('saldos_a_fecha');
@@ -255,7 +261,7 @@ Route::get('/saldos_a_fecha_pdf/', function () {
 	
 	    $pdf->Row($row);
 	}
-	$pdf->Output("D","saldo_deposito.pdf");	
+	$pdf->Output("D","saldo_a_fecha.pdf");	
 
 })->name('saldos_a_fecha_pdf');
 
@@ -269,12 +275,9 @@ Route::get('/stock_por_agrupacion_seleccion', function () {
 })->name('stock_por_agrupacion_seleccion');
 
 
+
 Route::post('/stock_por_agrupacion_seleccion', function () {
-
-
 	$titulo=$_POST['grupo'];
-
-
 	if ($_POST['grupo']=="Productos para la Venta") {
 		$g=1;
 		$saldos=DB::select("select p.codigo,p.nombre, p.marca, p.unidad_medida, s.id_producto, t.nombre as tipo_producto, sum(cantidad) as cantidad  from saldos s, productos p, tipo_producto as t where p.tipo_producto_id not in (4,7) and s.id_producto=p.id and t.id=p.tipo_producto_id group by p.codigo,p.nombre, p.marca, p.unidad_medida, s.id_producto, t.nombre",[]);}
@@ -282,8 +285,6 @@ Route::post('/stock_por_agrupacion_seleccion', function () {
 		$g=2;
 		$saldos=DB::select("select p.codigo,p.nombre, p.marca, p.unidad_medida, s.id_producto, t.nombre as tipo_producto, sum(cantidad) as cantidad  from saldos s, productos p, tipo_producto as t where p.tipo_producto_id  in (4,7) and s.id_producto=p.id and t.id=p.tipo_producto_id group by p.codigo,p.nombre, p.marca, p.unidad_medida, s.id_producto, t.nombre;",[]);
 	}
-
-
 		return view('stock_agrupacion',['saldos'=>$saldos, 'titulo'=>$titulo,'grupo'=>$g]);	
 })->name('stock_agrupacion');
 
@@ -343,10 +344,201 @@ Route::get('/stock_por_agrupacion_pdf/{grupo}', function ($grupo) {
 	
 	    $pdf->Row($row);
 	}
-	$pdf->Output("D","saldo_deposito.pdf");	
+	$pdf->Output("D","stock_por_agrupacion.pdf");	
 
 })->name('stock_por_agrupacion_pdf');
 
 
+Route::get('/stock_valorizado', function () {
+	
+	$stock = DB::select("select p.nombre, p.marca, p.unidad_medida, p.precio_costo, s.id_producto, p.precio_costo*sum(cantidad) as total,sum(cantidad) as cantidad from saldos s, productos p where s.id_producto=p.id group by p.nombre, p.marca, p.unidad_medida, s.id_producto order by p.nombre asc;",[]);
 
+
+    return view('stock_valorizado',['stock'=>$stock]);
+})->name('stock_valorizado');
+
+
+
+Route::get('/stock_valorizado_pdf/', function () {
+	$stock = DB::select("select p.nombre, p.marca, p.unidad_medida, p.precio_costo, s.id_producto, p.precio_costo*sum(cantidad) as total,sum(cantidad) as cantidad from saldos s, productos p where s.id_producto=p.id group by p.nombre, p.marca, p.unidad_medida, s.id_producto order by p.nombre asc;",[]);
+
+	$matriz=array();
+	$acum=0;
+	foreach ($stock as $p) {
+		$matriz[$p->id_producto]['nombre']=$p->nombre;
+		$matriz[$p->id_producto]['marca']=$p->marca;
+		$matriz[$p->id_producto]['unidad_medida']=$p->unidad_medida;
+
+		$matriz[$p->id_producto]['precio']=number_format ( $p->precio_costo, 2, "," , "." );
+		$matriz[$p->id_producto]['cantidad']=number_format ( $p->cantidad, 2, "," , "." );
+		$matriz[$p->id_producto]['saldo']=number_format ( $p->total, 2, "," , "." );
+		$acum=$acum+$p->total;		
+
+	}
+	
+    require('mc_table.php');
+	$pdf=new PDF_MC_Table();
+	$pdf->AddPage();
+	$pdf->Image('images/rincon.jpeg',180,6,15,15);
+	$pdf->SetFont('Arial','B',12);
+	$pdf->Write(5,"Stock Valorizado de Productos");
+	$pdf->Ln();
+	$pdf->SetFont('Arial','',11);
+	$pdf->Write(5,"Fecha:".date("d/m/Y",time()));
+	$pdf->Ln();
+	$pdf->Ln();
+	$pdf->SetFont('Arial','',9);
+	$cols=array();$aligns=array();
+	$cols[]=65;$titulos[]="Producto";$aligns[]="L";
+	$cols[]=30;$titulos[]="Marca";$aligns[]="L";
+	$cols[]=20;$titulos[]="U.M.";$aligns[]="C";
+	$cols[]=20;$titulos[]="Precio Costo";$aligns[]="R";
+	$cols[]=20;$titulos[]="Cantidad";$aligns[]="R";
+	$cols[]=30;$titulos[]="Saldo";$aligns[]="R";
+
+
+	$pdf->SetWidths($cols);$pdf->SetAligns($aligns);
+	$pdf->Row($titulos);
+
+	foreach($matriz as $m){
+
+		$row=array($m['nombre']);
+		$row[]=$m['marca'];
+		$row[]=$m['unidad_medida'];
+	    $row[]=$m['precio'];
+		$row[]=$m['cantidad'];
+	    $row[]=$m['saldo'];
+	    $pdf->Row($row);
+	}
+	$pdf->SetFont('Arial','B',11);
+	$pdf->SetWidths(array(155,30));$pdf->SetAligns(array("L","R"));
+	$pdf->Row(array("TOTAL",number_format($acum,2,",",".")));
+	$pdf->Output("D","stock_valorizado.pdf");	
+
+})->name('stock_valorizado_pdf');
+
+
+
+
+Route::get('/stock_punto_pedido', function () {
+	
+	$stock = DB::select("select p.nombre, p.marca, p.unidad_medida,p.stock_minimo,p.punto_pedido,p.stock_maximo,s.id_producto, p.tipo_producto_id,sum(cantidad) as cantidad from saldos s, productos p where s.id_producto=p.id and p.lleva_stock=1 and cantidad<=p.punto_pedido group by p.nombre, p.marca, p.unidad_medida,p.stock_minimo,p.punto_pedido,p.stock_maximo,s.id_producto, p.tipo_producto_id order by p.nombre asc;",[]);
+    return view('stock_punto_pedido',['stock'=>$stock]);
+})->name('stock_punto_pedido');
+
+
+
+
+Route::get('/saldos_bajo_punto_pedido_pdf/', function () {
+	$stock = DB::select("select p.nombre, p.marca, p.unidad_medida,p.stock_minimo,p.punto_pedido,p.stock_maximo,s.id_producto, p.tipo_producto_id,sum(cantidad) as cantidad from saldos s, productos p where s.id_producto=p.id and p.lleva_stock=1 and cantidad<=p.punto_pedido group by p.nombre, p.marca, p.unidad_medida,p.stock_minimo,p.punto_pedido,p.stock_maximo,s.id_producto, p.tipo_producto_id order by p.nombre asc;",[]);
+	$matriz=array();
+	
+	foreach ($stock as $p) {
+		$matriz[$p->id_producto]['nombre']=$p->nombre;
+		$matriz[$p->id_producto]['marca']=$p->marca;
+		$matriz[$p->id_producto]['unidad_medida']=$p->unidad_medida;
+		$matriz[$p->id_producto]['stock_min']=number_format ( $p->stock_minimo, 2, "," , "." );
+		$matriz[$p->id_producto]['pto_ped']=number_format ( $p->punto_pedido, 2, "," , "." );
+		$matriz[$p->id_producto]['saldo']=number_format ( $p->cantidad,2, "," , "." );
+		
+			
+
+	}
+	
+    require('mc_table.php');
+	$pdf=new PDF_MC_Table();
+	$pdf->AddPage();
+	$pdf->Image('images/rincon.jpeg',180,6,15,15);
+	$pdf->SetFont('Arial','B',12);
+	$pdf->Write(5,"Stock bajo de Punto de Pedido");
+	$pdf->Ln();
+	$pdf->SetFont('Arial','',11);
+	$pdf->Write(5,"Fecha:".date("d/m/Y",time()));
+	$pdf->Ln();
+	$pdf->Ln();
+	$pdf->SetFont('Arial','',9);
+	$cols=array();$aligns=array();
+	$cols[]=65;$titulos[]="Producto";$aligns[]="L";
+	$cols[]=30;$titulos[]="Marca";$aligns[]="L";
+	$cols[]=20;$titulos[]="U.M.";$aligns[]="C";
+	$cols[]=20;$titulos[]="Stock Minimo";$aligns[]="R";
+	$cols[]=20;$titulos[]="Punto de Pedido";$aligns[]="R";
+	$cols[]=30;$titulos[]="Stock Actual";$aligns[]="R";
+
+
+	$pdf->SetWidths($cols);$pdf->SetAligns($aligns);
+	$pdf->Row($titulos);
+
+	foreach($matriz as $m){
+
+		$row=array($m['nombre']);
+		$row[]=$m['marca'];
+		$row[]=$m['unidad_medida'];
+	    $row[]=$m['stock_min'];
+		$row[]=$m['pto_ped'];
+	    $row[]=$m['saldo'];
+	    $pdf->Row($row);
+	}
+
+	$pdf->Output("D","stock_bajo_pedido.pdf");	
+
+})->name('saldos_bajo_punto_pedido_pdf');
+
+
+Route::get('/productos_sin_stock_seleccion', function () {
+
+	$agrupacion = array("Productos para la Venta","Materias Primas e Insumos");
+    return view('/productos_sin_stock_seleccion',['agrupacion'=>$agrupacion]);
+})->name('productos_sin_stock_seleccion');
+
+
+
+
+Route::post('/productos_sin_stock_seleccion', function () {
+
+
+	$titulo=$_POST['grupo'];
+
+
+	if ($_POST['grupo']=="Productos para la Venta") {
+		$g=1;
+		$saldos=DB::select("select p.codigo,p.nombre, p.marca, p.unidad_medida, s.id_producto, t.nombre as tipo_producto, sum(cantidad) as cantidad from productos p left join saldos s on p.id=s.id_producto, tipo_producto t where p.tipo_producto_id not in (4,7) and t.id=p.tipo_producto_id and (cantidad=0 or cantidad is null) group by p.codigo,p.nombre, p.marca, p.unidad_medida, s.id_producto, t.nombre ",[]);}
+	else{
+		$g=2;
+		$saldos=DB::select("select p.codigo,p.nombre, p.marca, p.unidad_medida, s.id_producto, t.nombre as tipo_producto, sum(cantidad) as cantidad from productos p left join saldos s on p.id=s.id_producto, tipo_producto t where p.tipo_producto_id in (4,7) and t.id=p.tipo_producto_id and (cantidad=0 or cantidad is null) group by p.codigo,p.nombre, p.marca, p.unidad_medida, s.id_producto, t.nombre ",[]);
+	}
+
+
+		return view('productos_sin_stock',['saldos'=>$saldos, 'titulo'=>$titulo,'grupo'=>$g]);	
+})->name('productos_sin_stock');
+
+
+
+
+Route::get('/control_vencimientos_seleccion', function () {
+
+	$agrupacion = array("Productos para la Venta","Materias Primas e Insumos");
+    return view('/control_vencimientos_seleccion',['agrupacion'=>$agrupacion]);
+})->name('control_vencimientos_seleccion');
+
+
+
+
+Route::post('/control_vencimientos_seleccion', function () {
+
+
+	$titulo=$_POST['grupo'];
+
+
+	if ($_POST['grupo']=="Productos para la Venta") {
+		$g=1;
+		$saldos=DB::select("select s.depositos_id, s.deposito, s.lote, s.vencimiento, p.id as codigo,p.nombre, p.marca, p.unidad_medida, t.nombre as tipo, sum(cantidad) as total from vista_movimientos s, productos p, tipo_producto t where s.productos_id=p.id and p.tipo_producto_id=t.id and t.id not in (4,7) group by s.depositos_id, s.deposito, s.lote, s.vencimiento, p.id,p.nombre, p.marca, p.unidad_medida, t.nombre having sum(cantidad)>0 order by s.vencimiento asc ",[]);}
+	else{
+		$g=2;
+		$saldos=DB::select("select s.depositos_id, s.deposito, s.lote, s.vencimiento, p.id as codigo, p.nombre, p.marca, p.unidad_medida, t.nombre as tipo, sum(cantidad) as total from vista_movimientos s, productos p, tipo_producto t where s.productos_id=p.id and p.tipo_producto_id=t.id and t.id in (4,7)  group by s.depositos_id, s.deposito, s.lote, s.vencimiento, p.id, p.nombre, p.marca, p.unidad_medida, t.nombre  having sum(cantidad)>0 order by s.vencimiento asc",[]);
+	}
+
+
+		return view('control_vencimientos',['saldos'=>$saldos, 'titulo'=>$titulo,'grupo'=>$g]);	
+})->name('control_vencimientos');
 

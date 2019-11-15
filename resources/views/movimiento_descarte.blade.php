@@ -15,9 +15,9 @@
         <input type=hidden name=id value="{{$producto->id}}">
 
         <div class="form-group row ">
-            <div class="col-sm-2 mb-3 mb-sm-0">
+            <div class="col-sm-3 mb-3 mb-sm-0">
                <label for="fecha_mov">Fecha de Salida</label>
-              <input class="form-control" type="date" name=fecha_movimiento value="{{ date('Y-m-d') }}">
+              <input class="form-control" type="date" name=fecha_movimiento id=fecha_mov value="{{ date('Y-m-d') }}">
             </div>
 
         </div>
@@ -34,18 +34,19 @@
                     <Th> </Th>
                     <th>DEPOSITO</th>
                       <th>LOTE Nro.</th>
+                      <th>VENCIMIENTO </th>
                       <th>SALDO</th>
                      
                    </tr>
                   </thead>
+                   <?php $primero=true; ?>
                 @foreach ($saldos as $p)
                   <tr>
-                    <td><input type="radio" name=stock_deposito value={{$p->id_lote_mp}}-{{$p->id_lote_produccion_id}}-{{$p->id_deposito}}-{{ $p->saldo }}></td>
+                    <td><input type="radio" name=stock_deposito <?php if ($primero){$primero=false; echo "checked";} ?> value={{$p->id_lote_mp}}-{{$p->id_lote_produccion_id}}-{{$p->id_deposito}}-{{ $p->saldo }}></td>
                     <td>{{$p->nombre_deposito}}</td>
                     <td>{{ $p->numero_lote }}</td> 
-                    <td class="text-info"> {{ $p->saldo }} {{ $producto->unidad_medida }}</td>
-                   
-                    
+                     <td>{{ date('d-m-Y', strtotime($p->vencimiento))}}</td> 
+                    <td class="text-info"> {{ $p->saldo }} {{ $producto->unidad_medida }}</td>        
                   </tr>
                 @endforeach
               </table>

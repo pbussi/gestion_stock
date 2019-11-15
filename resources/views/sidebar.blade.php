@@ -49,13 +49,13 @@
              <a class="collapse-item" href={{ url('/stock_seleccion_deposito') }}>Stock por deposito</a>
              <a class="collapse-item" href={{ url('/saldos_a_fecha') }}>Stock a fecha</a>
              <a class="collapse-item" href={{ url('/stock_por_agrupacion_seleccion')}}>Stock por agrupacion</a>
-           
-          
-          
+            <a class="collapse-item" href={{ url('/control_vencimientos_seleccion') }}>Control Vencimientos</a>
+
            <h6 class="collapse-header">Valorizacion</h6>
-            <a class="collapse-item" href="cards.html">Existencias</a>
-            <a class="collapse-item" href="cards.html">Stock Min/Max/Pto Pedido</a>
-            <a class="collapse-item" href="cards.html">Costo de Productos</a>
+            <a class="collapse-item" href="{{ url('/stock_valorizado') }}">Existencias</a>
+            <a class="collapse-item" href="{{ url('/stock_punto_pedido') }}">Stock Min/Max/Pto Pedido</a>
+            <a class="collapse-item" href="{{ url('/productos_sin_stock_seleccion') }}">Productos sin stock</a>
+     
           </div>
         </div>
       </li>
@@ -86,8 +86,10 @@
         <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">Clientes:</h6>
-            <a class="collapse-item" href="utilities-color.html">Nomina</a>
-            <a class="collapse-item" href="utilities-border.html">Pedidos</a>
+            <a class="collapse-item" href={{ url('/clientes')}}>Nomina</a>
+            <h5 class="collapse-header">Listas de Precios</h5>
+            <a class="collapse-item" href="{{ url('/listas') }}">Listas de Precios</a>
+            <a class="collapse-item" href="utilities-border.html">Actualización</a>
             <a class="collapse-item" href="utilities-animation.html">Informes</a>
             
           </div>

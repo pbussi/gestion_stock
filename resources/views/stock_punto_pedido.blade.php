@@ -5,12 +5,12 @@
  
  <div class="container-fluid">
           <!-- Page Heading -->
-          <h1 class="h3 mb-2 text-gray-800">Stock Actual de Productos</h1>
+          <h1 class="h3 mb-2 text-gray-800">Productos Bajo Punto de Pedido</h1>
 
          <div class="card-header py-3">
-              <h6 class="m-0 text-info font-weight-bold text-uppercase mb-4"><b> Saldos al {{date('d-m-Y')}} </b>
+              <h6 class="m-0 text-info font-weight-bold text-uppercase mb-4"><b> Fecha: {{date('d-m-Y')}} </b>
 
-               <a href="{{ url('saldos_a_fecha_pdf') }}"  class=" btn btn-warning btn-icon-split float-right" style="margin-left: 10px;">
+               <a href="{{ url('saldos_bajo_punto_pedido_pdf') }}"  class=" btn btn-warning btn-icon-split float-right" style="margin-left: 10px;">
                     <span class="icon text-white-50">
                       <i class="fas fa-print"></i>
                     </span>
@@ -20,7 +20,6 @@
               </h6>
             </div>
 
-          <p class="mb-4">En todos los depósitos administrados por el sistema</p>
           <!-- DataTales Example -->
           <div class="card shadow mb-4">
             
@@ -33,7 +32,9 @@
                 <th scope="col">Nombre</th>
                  <th scope="col">Marca</th>
                 <th scope="col">U.M.</th>
-                <th scope="col"  style="text-align:center;">Saldo</th>
+                <th scope="col"  style="text-align:right;">Stock Minimo</th>   
+                <th scope="col" style="text-align:right;">Punto de Pedido</th>
+                <th scope="col"  style="text-align:right;">Stock Actual</th>
               </tr>
             </thead>
            <tbody>
@@ -45,15 +46,19 @@
               <td><a href=""> <b>{{ $s->nombre }}</b></a></td>
                <td>{{ $s->marca}}</td>
               <td>{{ $s->unidad_medida }}</td>
-              <td style="text-align:right"> {{number_format($s->cantidad,2,",",".")}}</td>    
+              <td style="text-align:right"> {{number_format($s->stock_minimo,2,",",".")}}</td>  
+              <td style="text-align:right"> {{number_format($s->punto_pedido,2,",",".")}}</td>  
+              <td style="text-align:right;"<?php if ($s->cantidad<=$s->stock_minimo) echo ' class="text-danger' ?>
+                @if ($s->cantidad<=$s->stock_minimo)
+                   data-toggle="tooltip" data-placement="left" title="Producto bajo Stock Mínimo"
+                @endif
+                > 
+                {{number_format($s->cantidad,2,",",".")}}</td>    
               <?php $acum=$acum + $s->cantidad; ?>          
                      
             </tr>
             @endforeach
-            <thead>
-             <tr style="height: 50px;">
-                        <td colspan=7  style="text-align:right" ><b>TOTAL:  $ <?php echo number_format($acum,2,",","."); ?></b></td></tr>
-            <thead>
+           
           </tbody>
         </table>
       </div>

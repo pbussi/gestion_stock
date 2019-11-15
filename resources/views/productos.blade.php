@@ -40,24 +40,24 @@
                         <th>Stock Minimo</th>
                         <th>Stock Maximo</th>
                         <th>Punto Pedido</th>
-                        <th class="w-10">Accion</th>
+                        <th class="w-10"></th>
                     </tr>
                   </thead>
                   <tbody>
 
                     @foreach ($productos as $p)
                     <tr>
-                      <th scope="row">{{ $p->codigo }}</th>
+                      <th scope="row"><small>{{ $p->codigo }}</small></th>
                       <td>
                         @if ($p->imagen != '')
                         <img src='data:image/JPG;base64,{{base64_encode($p->imagen)}}' width=60px;/>
                         @endif
                       </td>
-                      <td><a href="{{ url('/movimiento_producto',$p->id) }}"><B>{{ $p->nombre }}</B></a></td>
-                      <td>{{ $p->marca }}</td>
+                      <td class="text-uppercase" style="width:30%"><a href="{{ url('/movimiento_producto',$p->id) }}"><B>{{ $p->nombre }}</B></a></td>
+                      <td  style="width:5%">{{ $p->marca }}</td>
                       <td>{{ $p->unidad_medida }}</td>
                       <td>{{ $p->tipo_nombre }}</td>
-                      <td style="text-align: right;">${{ $p->precio_costo }}</td>
+                      <td style="text-align: right;">${{ $p->precio_costo }}</td> 
                       <td>
                         @if ($p->lleva_stock === 1)
                         SI
@@ -68,18 +68,18 @@
                       <td>{{ $p->stock_minimo }}</td>
                       <td>{{ $p->stock_maximo }}</td>
                       <td>{{ $p->punto_pedido }}</td>
-                      <td class="w-10"> 
+                      <td class="w-10" style="width:20%"> 
                         <a href="{{ url('/producto_edit',$p->id) }}" class="float-left">
                         <span class="icon">
-                          <i class="fas fa-edit"></i>
+                          <i class="fas fa-edit">  &nbsp;  &nbsp;</i>
                         </span>
                         </a>
-                    {{--
+                       
                         <a href="{{ url('/productos') }}?borrar={{$p->id}}" class="float-left">
                         <span class="icon">
                           <i class="fas fa-trash"></i> 
                         </span>
-                      </a> --}}
+                      </a> 
                       </td>
                     </tr>
                     @endforeach

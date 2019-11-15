@@ -14,7 +14,18 @@ Route::get('/lote_produccion_nuevo', function () {
 })->name('lote_produccion_nuevo');
 
 Route::post('/lote_produccion_nuevo', function () {
-    DB::select("insert into lotes_produccion values (NULL,?,?,?,?,?,1)",[$_POST['fecha_lote'],$_POST['base'],$_POST['pasteurizacion_temperatura'],$_POST['pasteurizacion_tiempo'],$_POST['observaciones']]);	
+
+	$past_temp=$_POST['pasteurizacion_temperatura'];
+	$past_tiempo=$_POST['pasteurizacion_tiempo'];
+	$observaciones=$_POST['observaciones'];
+
+	if ($_POST['pasteurizacion_temperatura']=="" )
+			$past_temp=NULL;
+	if ($_POST['pasteurizacion_tiempo']=="" )
+			$past_tiempo=NULL;
+	if ($_POST['observaciones']=="" )
+			$observaciones=NULL;
+    DB::select("insert into lotes_produccion values (NULL,?,?,?,?,?,1)",[$_POST['fecha_lote'],$_POST['base'],$past_temp,$past_tiempo,$observaciones]);	
 	$id = DB::getPdo()->lastInsertId();
 	return redirect()->route('lotes_produccion_gestion',$id)->with('success',"El lote $id se ha creado correctamente.");
 
@@ -39,7 +50,7 @@ Route::get('/lotes_produccion_gestion/{id}', function ($id) {
 
 	}
 	$lote=DB::select('select * from lotes_produccion where id=?',[$id]);
-	$productos=DB::select('select * from productos');
+	$productos=DB::select('select * from productos where tipo_producto_id in (4,7)');
 	$lote = $lote[0];
 	$ingredientes=DB::select('select *,lp.id as lp_id from mp_lote_produccion lp,lotes_mp mp,productos p where lotes_prod_id=? and lp.lotes_mp_id=mp.id and mp.productos_id=p.id',[$id]);
 	$terminados=DB::select("select p.*,l.id as pt_id from productos p,productos_lote_produccion l where l.productos_id=p.id and l.lotes_produccion_id=?",[$id]);
@@ -72,6 +83,7 @@ Route::get('/lotes_produccion_gestion_info/{id}', function ($id) {
 
 Route::get('/lotes_produccion_gestion_terminados/{id}', function ($id) {
 	if (isset($_GET['borrar'])){
+		DB::select('update mp_lote_produccion set id_lote_prod_terminado=NULL where id_lote_prod_terminado=?',[$_GET['borrar']]);
 		DB::select('delete from movimientos where productos_lote_produccion_id=?',[$_GET['borrar']]);
 		DB::select('delete from productos_lote_produccion where id=?',[$_GET['borrar']]);
 		
@@ -148,10 +160,16 @@ Route::get('/lotes_produccion_pdf/{id}', function ($id) {
 	
 	$pdf->SetFillColor(255, 255, 255);
 	$pdf->Cell(180, 10, "LOTE PROD".str_pad($id,6,"0", STR_PAD_LEFT). "    -   FECHA DE PRODUCCION: " .date("d/m/Y",strtotime($lote->fecha)), 0, 0, 'C', true);
-	$pdf->Ln();	$pdf->Ln();
+	$pdf->Ln();
 
+	$pdf->Cell(180, 10, "BASE:". strtoupper($lote->base));
+	$pdf->Ln();	$pdf->Ln();
+	$pdf->SetFont('Arial','',10);
+	$pdf->Cell(180, 10, "Observaciones:". strtoupper($lote->observaciones));
+	$pdf->Ln();
 	$pdf->SetWidths(array(60,30,30,30,30));//$pdf->SetAligns($aligns);
 	//$pdf->SetCellHeight(10);
+	$pdf->SetFont('Arial','',12);
 	$pdf->Row(array("PASTEURIZACION ","Temperatura: ", $lote->pasteurizacion_temperatura.utf8_decode(" °C"),"Tiempo: ",$lote->pasteurizacion_tiempo . " Min."));
 
     $pdf->Ln();	$pdf->Ln();

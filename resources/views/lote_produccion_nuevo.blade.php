@@ -21,7 +21,7 @@
       <div class="form-group row">
           <div class="col-sm-3 mb-3 mb-sm-0">
             <label for="fecha">Fecha</label>
-            <input class="form-control" type="date" name=fecha_lote value="{{ date('d-m-Y') }}">
+            <input class="form-control" type="date" name=fecha_lote id=fecha_lote value="{{ date('d-m-Y') }}">
           </div>    
       </div>
 
@@ -56,7 +56,15 @@
                <textarea name="observaciones" style="width: 60%"></textarea>
             </div>
          </div>
-        <a href="#"  onclick="document.getElementById('nuevo_lote').submit();" class="btn btn-success btn-icon-split">
+        <a href="#"  onclick='
+        if ($("#fecha_lote").val()==""){
+          alert("Ingrese fecha valida");
+          return;
+        }
+        document.getElementById("nuevo_lote").submit();
+
+
+        ' class="btn btn-success btn-icon-split">
          <span class ="icon text-white-50">
                       <i class="fas fa-check-double"></i>
                     </span>
