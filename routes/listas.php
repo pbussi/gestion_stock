@@ -79,6 +79,7 @@ Route::post('/lista_gestion', function () {
  	return redirect()->route('lista_gestion',["id"=>$_POST["lista_id"]])->with('success','Lista de Precios actualizada!');
 });
 
+
 Route::post('/lista_gestion_agregar', function () {
 	DB::select("insert into item_lista_precios values (null,?,?,0)",[$_POST['item'],$_POST['lista_id']]);
  	return redirect()->route('lista_gestion',["id"=>$_POST["lista_id"]])->with('success','Item agregado!');
@@ -88,7 +89,7 @@ Route::post('/lista_gestion_agregar', function () {
 Route::get('/lista_pdf/{id}', function ($id) {
 	$items=DB::select("select i.id,i.productos_id,i.lista_precios_id, i.precio,p.codigo, p.nombre, p.marca, p.unidad_medida,p.tipo_producto_id, t.nombre as tipo 
 		from item_lista_precios i, productos p, tipo_producto t 
-		where i.lista_precios_id=? and i.productos_id=p.id and p.tipo_producto_id=t.id and p.tipo_producto_id not in (4,7)",[$id]);
+		where i.lista_precios_id=? and i.productos_id=p.id and p.tipo_producto_id=t.id and p.tipo_producto_id not in (4,7) order by p.nombre asc;",[$id]);
 
 	$lista=DB::select("select * from lista_precios where id=?",[$id]);
 	$lista=$lista[0];
@@ -142,3 +143,29 @@ Route::get('/lista_pdf/{id}', function ($id) {
 
 })->name('lista_pdf');
 
+
+Route::get('/lista_actualizacion_seleccion', function () {
+	$listas = DB::select('select * from lista_precios');
+    return view('lista_actualizacion_seleccion', ['listas' => $listas]);
+})->name('lista_actualizacion_seleccion');
+
+Route::post('/lista_actualizacion_seleccion', function () {
+	$lista = DB::select("select * from lista_precios where id=?",[$_POST["lista"]]);
+	$lista=$lista[0];
+    return view('lista_actualizacion_global', ['lista' => $lista]);
+})->name('lista_actualizacion_global');
+
+
+Route::post('/lista_actualizacion_global', function () {
+	$items = DB::select('update item_lista_precios set precio=(precio + (precio*?)/100) where lista_precios_id=?',[$_POST['porcentaje'],$_POST['id']]);
+    return redirect()->route('lista_precios_informe',['id'=>$_POST['id']])->with('success','Lista de Precios actualizada!');
+})->name('lista_actualizacion_global');
+
+
+Route::get('/lista_precios_informe/{id}', function ($id) {
+
+	$items=DB::select("select i.id,i.productos_id,i.lista_precios_id, i.precio,p.codigo, p.nombre, p.marca, p.unidad_medida,p.tipo_producto_id, t.nombre as tipo from item_lista_precios i, productos p, tipo_producto t where i.lista_precios_id=? and i.productos_id=p.id and p.tipo_producto_id=t.id and p.tipo_producto_id not in (4,7) order by p.nombre asc",[$id]);
+	$lista=DB::select("select * from lista_precios where id=?",[$id]);
+	$lista=$lista[0];
+	return view('lista_precios_informe',['items'=>$items, 'lista'=>$lista]);
+})->name('lista_precios_informe');

@@ -89,8 +89,11 @@
             <a class="collapse-item" href={{ url('/clientes')}}>Nomina</a>
             <h5 class="collapse-header">Listas de Precios</h5>
             <a class="collapse-item" href="{{ url('/listas') }}">Listas de Precios</a>
-            <a class="collapse-item" href="utilities-border.html">Actualización</a>
+            <a class="collapse-item" href="{{ url('lista_actualizacion_seleccion')}}">Actualización</a>
             <a class="collapse-item" href="utilities-animation.html">Informes</a>
+
+            <h6 class="collapse-header">Ventas</h6>
+            <a class="collapse-item" href={{ url('/venta_nueva')}}>Ingreso Pedido</a>
             
           </div>
         </div>

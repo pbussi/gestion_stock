@@ -3,8 +3,20 @@
 Route::get('/clientes', function () {
 	if (isset($_GET['borrar']))
 	{
-		DB::select('delete from productos where id=?',[$_GET['borrar']]);
+		try{
+		DB::select('delete from clientes where id=?',[$_GET['borrar']]);
+		}
+		catch (Exception $e){
+			return redirect()->route('clientes')->with('error',"No se puede eliminar el cliente.  Existen movimientos asociados");
+		}
+	return redirect()->route('clientes')->with('success','El cliente ha sido eliminado');
+
+
 	}
+
+
+
+
 	$clientes = DB::select('select * from clientes');
 
     return view('clientes', ['clientes' => $clientes]);

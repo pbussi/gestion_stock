@@ -39,7 +39,7 @@
                         <th>Provincia</th>
                         <th>Telefono</th>
                         <th>Mail</th>
-                        <th>Lista asociada</th>
+                     <!--   <th>Lista asociada</th>  -->
                         <th class="w-10"></th>
                     </tr>
                   </thead>
@@ -48,20 +48,25 @@
                     @foreach ($clientes as $p)
                     <tr>
                       <th scope="row"><small>{{ $p->id }}</small></th>
-                      <td class="text-uppercase" style="width:30%"><a href="{{ url('/cliente_edit',$p->id) }}"><B>{{ $p->razon_social }}</B></a></td>
-                      <td  style="width:15%">{{ $p->cuit }}</td>
+                      <td class="text-uppercase" style="width:20%"><a href="{{ url('/cliente_edit',$p->id) }}"><B>{{ $p->razon_social }}</B></a></td>
+                      <td  style="width:12%">{{ $p->cuit }}</td>
                       <td>{{ $p->direccion }}</td>
                       <td>{{ $p->localidad }}</td>
                       <td>{{ $p->provincia }}</td>
                       <td>{{ $p->telefono }}</td>
                       <td>{{ $p->mail }}</td>
-                      <td>{{ $p->lista_precios_id }}</td>
+                    <!--  <td>{{ $p->lista_precios_id }}</td>  -->
                       <td class="w-10"> 
                         <a href="{{ url('/cliente_edit',$p->id) }}" class="float-left">
                         <span class="icon">
                           <i class="fas fa-edit"></i>
                         </span>
                         </a>
+                         <a href="{{ url('/clientes') }}?borrar={{$p->id}}" class="float-left">
+                        <span class="icon">
+                          <i class="fas fa-trash"></i> 
+                        </span>
+                      </a> 
                       </td>
                     </tr>
                     @endforeach
