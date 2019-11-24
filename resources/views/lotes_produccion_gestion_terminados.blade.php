@@ -2,7 +2,7 @@
 @extends('layout')
 
 @section('content')
-  <script src=http://localhost/proyecto/gestion_stock/public/vendor/jquery/jquery.min.js></script>
+<script src={{ asset('/vendor/jquery/jquery.min.js') }}></script>
   <div class="container-fluid">
     <h1 class="h3 mb-2 text-gray-800">Lote Producción  Nro. <B> <?php echo "PROD".str_pad($lote->id,6,"0", STR_PAD_LEFT); ?></B> </h1>
 

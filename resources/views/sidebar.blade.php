@@ -94,6 +94,8 @@
 
             <h6 class="collapse-header">Ventas</h6>
             <a class="collapse-item" href={{ url('/venta_nueva')}}>Ingreso Pedido</a>
+            <a class="collapse-item" href={{ url('/pedidos_listado')}}>Pedidos Pendientes</a>
+            <a class="collapse-item" href={{ url('/pedidos_enviados')}}>Pedidos Enviados</a>
             
           </div>
         </div>

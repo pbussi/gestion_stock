@@ -1,6 +1,6 @@
 @extends('layout')
 @section('content')
- <script src=http://localhost/proyecto/heladeria_rincon/public/vendor/jquery/jquery.min.js></script>
+ <script src={{ asset('/vendor/jquery/jquery.min.js') }}></script>
  <div class="container-fluid">
           <!-- Page Heading -->
           <h1 class="h3 mb-2 text-gray-800">Movimientos de Productos</h1>
