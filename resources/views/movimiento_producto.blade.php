@@ -22,20 +22,21 @@
                   <thead>
                     <tr>
                         <th>Fecha</th>
-                         <th>Tipo movimiento</th>
+                         <th style="text-align:left;">Comprobante Asociado</th>
                         <th>Lote</th>
                         <th>Vencimiento</th>
-                        <th>Cantidad</th>
-                        <th>Subtotal</th>
+                        <th style="text-align:right;">Cantidad</th>
+                        <th style="text-align:right;">Subtotal</th>
+                        <th></th>
                     </tr>
                   </thead>
                  <?php $subtotal=0 ?>
                  @foreach ($movs as $mov)
                 <tr><td>{{date('d-m-Y', strtotime($mov->fecha)) }}</td>
-                  <td > {{$mov->comprobante_asociado }}</td>
+                  <td style="text-align:left;""> {{$mov->comprobante_asociado }}</td>
                   <td>{{$mov->lote }}</td><td>{{date('d-m-Y', strtotime($mov->vencimiento)) }}</td>
-                  <td @if ($mov->cantidad<0) class='text-danger' @endif ><b>{{$mov->cantidad }}</b></td>
-                    <td><?php $subtotal=$subtotal+$mov->cantidad; print $subtotal ?></td></tr>
+                  <td style="text-align:right;" @if ($mov->cantidad<0) class='text-danger' @endif ><b>{{$mov->cantidad }}</b></td>
+                    <td style="text-align:right;"><?php $subtotal=$subtotal+$mov->cantidad; print number_format($subtotal,2,",",".") ?></td></tr>
            
                 @endforeach
                  <tfoot>
@@ -44,8 +45,8 @@
                          <th></th>
                         <th></th>
                         <th></th>
-                        <th align="right">Saldo: </th>
-                        <th class='text-info font-weight-bold'>{{ $saldosxdep[$mov->depositos_id]['saldo'] }}</th>
+                        <th style="text-align:right; font-size:19px;">Saldo: </th>
+                        <th class='text-info font-weight-bold' style="text-align:right;font-size:19px;">{{ $saldosxdep[$mov->depositos_id]['saldo'] }}</th>
                     </tr>
 
                 </table>

@@ -32,12 +32,22 @@
               @endif
           @endif
          </i> </h5>
-           <a href="{{ url('/venta_pdf',$venta->id) }}" class=" btn btn-warning btn-icon-split float-right" style="margin-left: 10px;">
+          @if ($venta->estado==1){
+           <a href="{{ url('/remitos_pdf',$venta->id) }}" class=" btn btn-warning btn-icon-split float-right" style="margin-left: 10px;">
               <span class="icon text-white-50">
                   <i class="fas fa-print"></i>
               </span>
               <span class="text">Imprimir</span>
             </a>
+          @endif
+           @if ($venta->estado==2){
+           <a href="{{ url('/remitos_pdf',$venta->id) }}" class=" btn btn-warning btn-icon-split float-right" style="margin-left: 10px;">
+              <span class="icon text-white-50">
+                  <i class="fas fa-print"></i>
+              </span>
+              <span class="text">Imprimir</span>
+            </a>
+          @endif
 
             @if ($venta->estado==0 and $item_pedidos!=null)          
               <a href="{{ url('/venta_cambiar_estado',$venta->id) }}?estado=1" class=" btn btn-info btn-icon-split float-right" style="margin-left: 10px;">
@@ -68,17 +78,17 @@
               <th scope="col">Codigo</th>
               <th scope="col">Producto</th>
               <th scope="col">U.M.</th>
-              <th scope="col">Cant. Pedida</th>
+              <th scope="col" width="5%">Cant. Pedida</th>
               @if ($venta->estado!=0)
-              <th scope="col">Cant. a Facturar</th>
+              <th scope="col" width="5%">Cant. a Facturar</th>
               @endif
               <th scope="col">Precio Unitario</th>
               <th scope="col">Total</th>
               @if ($venta->estado!=0)
-              <th scope="col">Lotes asignados</th>
+              <th scope="col" width="10%">Lotes asignados</th>
               @endif
               @if ($venta->estado==1)
-              <th scope="col">Eliminar Asignacion</th>
+              <th scope="col" width="10%">Eliminar Asignacion</th>
               @endif
                @if ($venta->estado==0)
               <th scope="col" align="center">Acciones</th>
@@ -87,6 +97,7 @@
             </tr>
           </thead>
           <tbody>
+            <?php $totalPedido=0; ?>
             @foreach ($item_pedidos as $i)
             <tr>
               <td>{{ $i->codigo }}</td>
@@ -108,8 +119,8 @@
                 <form method=POST action="{{url('/modificar_precio_item',$venta->id)}}" id="nuevo_precio_"{{$i->id_item}}>
                   @csrf
                     <input type=hidden name=item value={{$i->id_item}}>
-                     $ <input type=text  style="width:90px;" name=nuevo_precio value={{ number_format($i->precio,2,",",".")}}>
-                       <a href="#" class="float-right text-secondary" onclick="document.getElementById('nuevo_precio_{{$i->id_item}}').submit">
+                     $ <input type=text  style="width:80px; text-align: right; <?php if($i->precio==0) echo 'background-color: #FFEDB5;'; else echo 'background-color: #ffffff;' ?>" name=nuevo_precio value={{ number_format($i->precio,2,",",".")}}>
+                       <a href="#" class="float-right text-secondary" onclick="document.getElementById('nuevo_precio_{{$i->id_item}}').submit">&nbsp;
                         <span class="icon">
                           <i class="fas fa-recycle"></i> 
                         </span>
@@ -119,17 +130,19 @@
               <td align="right">
                    @if ($venta->estado==0)
                      $ {{ number_format($i->cantidad * $i->precio,2,",",".") }}
+                     <?php $totalPedido+=$i->cantidad*$i->precio ?>
                    @else
-                       $ {{ number_format(-$asignado * $i->precio,2,",",".") }} 
+                       $ {{ number_format(-$asignado * $i->precio,2,",",".") }}
+                          <?php $totalPedido+=-$asignado*$i->precio ?> 
                    @endif 
                  </td>
               @if ($venta->estado!=0)
               <td align="center">
                 @if (count($asignaciones[$i->id])>0)
-                    <a href="#" class="text-secondary"><i class="fas fa-info-circle fa-2x text--300" data-toggle="modal" data-target="#info_asignacion_{{$i->id}}"></i></a>
+                    <a href="#" class="text-secondary" title="Ver Lotes Asignados"><i class="fas fa-info-circle fa-2x text--300" data-toggle="modal" data-target="#info_asignacion_{{$i->id}}"></i></a>
                      @if ($venta->estado==1)
                       <td align=center> 
-                        <a href="#" class="text-secondary" onclick="if (confirm('Desea quitar la asignacion de estos productos. Se eliminarán los moviminetos'))  window.location.href='{{ url('/desasignar_lotes_venta',$venta->id) }}/{{$i->id}}'">
+                        <a href="#" class="text-secondary" title="Eliminar Lotes Asignados" onclick="if (confirm('Desea quitar la asignacion de estos productos. Se eliminarán los movimientos'))  window.location.href='{{ url('/desasignar_lotes_venta',$venta->id) }}/{{$i->id}}'">
                           <i class="fas fa-minus-circle fa-2x text--300" ></i>
                         </a>
                       </td>
@@ -146,16 +159,26 @@
               @endif
               @if ($venta->estado==0)
               <td class="w-10" align="center"> 
-                         <a href="{{url('/desasignar_lotes_venta',$venta->id) }}/{{$i->id}}?borrar" class="float-left text-secondary">
+                         <a href="{{url('/desasignar_lotes_venta',$venta->id) }}/{{$i->id}}?borrar" class="float-left text-secondary" title="Eliminar Producto">
                         <span class="icon">
                           <i class="fas fa-trash fa-2x"></i> 
                         </span>
                       </a> 
+                       <a href="#" class="text-secondary" title="Ver Stock"><i class="fas fa-search fa-2x text--300" data-toggle="modal" data-target="#ver_stock_{{$i->id}}"></i></a>
               </td>
               @endif
             </tr>
             @endforeach
           </tbody>
+          <tfoot>
+            @if ($item_pedidos !=null)
+                @if ($venta->estado==0)
+                    <tr><td colspan=5 align=right>Total Pedido: </td><td align="right"><B><?php echo "$" .number_format($totalPedido,2,",",".") ?> </B></td></tr>
+                @else
+                     <tr><td colspan=6 align=right>Total Pedido: </td><td align="right"><B><?php echo "$ " .number_format($totalPedido,2,",",".") ?> </B></td></tr>
+                @endif     
+            @endif     
+          </tfoot>
          </table>
         </div>
       </div>  <!--div card-body -->
@@ -256,6 +279,43 @@
   </div>
 </div>
 @endforeach
+
+
+<!-- Modales de saldos de stock -->
+@foreach ($item_pedidos as $i)
+<div class="modal fade" id="ver_stock_{{$i->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+          <h6 class="modal-title text-info font-weight-bold text-uppercase mb-3" id="exampleModalLongTitle">Stock para {{$i->nombre}}</h6>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+         <div class="table-responsive"> 
+         
+              
+             <table class="table table-bordered small" width="100%" cellspacing="0">
+                <tr>
+                   <th scope="col">Deposito</th>
+                   <th scope="col">Saldo</th>  
+                   <th scope="col">U.M.</th>      
+                </tr>
+               @foreach ($saldo_producto[$i->id] as $s)
+                <tr>
+                  <td>{{$s->nombre}}</td>
+                   <td width=20%>{{$s->cantidad}}</td>
+                   <td>{{$s->unidad_medida}}</td>
+                </tr>
+               @endforeach
+             </table>
+          </div>
+        
+      </div>
+  </div>
+</div>
+@endforeach
+
 
 @if ($venta->estado==0)
 <form action="{{ url('/venta_gestion_nuevo_item',$venta->id) }}" id=nuevo_item_venta method=POST>

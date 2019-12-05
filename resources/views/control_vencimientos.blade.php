@@ -40,7 +40,7 @@
                                 <th>Lote</th>
                                 <th>Deposito</th>
                                 <th>Vencimiento</th>
-                                <th>Cantidad</th>
+                                <th style="text-align:right;">Cantidad</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -58,7 +58,7 @@
                           echo "class='text-danger'";
                           ?>
                          > {{ date('d-m-Y', strtotime($s->vencimiento))}}</td>
-                         <td>{{$s->total}}</td>
+                         <td style="text-align:right;">{{$s->total}}</td>
                       
                     </tr>
 

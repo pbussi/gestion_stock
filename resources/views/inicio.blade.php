@@ -7,7 +7,7 @@
 
           <!-- Page Heading -->
           <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+            <h1 class="h3 mb-0 text-gray-800">Tablero de Control</h1>
             <!--a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> Generate Report</a-->
           </div>
 
@@ -19,11 +19,11 @@
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Movimientos en el mes</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800">$40,000</div>
+                      <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Ventas del mes</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">$ {{number_format($ventas,2,".",",")}}</div>
                     </div>
-                    <div class="col-auto">
-                      <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                    <div class="col-auto"><a href="{{ url('/ventas_seleccion') }}">
+                      <i class="fas fa-calendar fa-2x text-gray-300"></i></a> 
                     </div>
                   </div>
                 </div>
@@ -36,11 +36,11 @@
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Stock valorizado (Actual)</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800">$215,000</div>
+                      <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Stock valorizado</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">$ {{number_format($valorizado,2,".",",")}}</div>
                     </div>
-                    <div class="col-auto">
-                      <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                    <div class="col-auto"><a href="{{ url('/stock_valorizado') }}"
+                      <i class="fas fa-dollar-sign fa-2x text-gray-300"></i></a>
                     </div>
                   </div>
                 </div>
@@ -53,10 +53,10 @@
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-uppercase mb-1" style="color: #258391">Lotes incompletos</div>
+                      <div class="text-xs font-weight-bold text-uppercase mb-1" style="color: #258391">Pedidos Pendientes</div>
                       <div class="row no-gutters align-items-center">
                         <div class="col-auto">
-                          <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">50</div>
+                          <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{$pendientes}}</div>
                         </div>
                         <div class="col">
                           <div class="progress progress-sm mr-2">
@@ -65,8 +65,8 @@
                         </div>
                       </div>
                     </div>
-                    <div class="col-auto">
-                      <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                    <div class="col-auto"><a href="{{ url('/pedidos_listado') }}"
+                      <i class="fas fa-clipboard-list fa-2x text-gray-300"></i></a>
                     </div>
                   </div>
                 </div>
@@ -79,11 +79,11 @@
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pedidos sin asignar</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                      <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Lotes en Produccion</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{$en_produccion}}</div>
                     </div>
-                    <div class="col-auto">
-                      <i class="fas fa-comments fa-2x text-gray-300"></i>
+                    <div class="col-auto"><a href="{{ url('/lotes_produccion') }}">
+                      <i class="fas fa-comments fa-2x text-gray-300"></i></a>
                     </div>
                   </div>
                 </div>

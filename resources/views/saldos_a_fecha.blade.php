@@ -52,7 +52,7 @@
             @endforeach
             <thead>
              <tr style="height: 50px;">
-                        <td colspan=7  style="text-align:right" ><b>TOTAL:  $ <?php echo number_format($acum,2,",","."); ?></b></td></tr>
+                        <td colspan=7  style="text-align:right" >CANTIDAD TOTAL: <b>  <?php echo number_format($acum,2,",","."); ?></b></td></tr>
             <thead>
           </tbody>
         </table>

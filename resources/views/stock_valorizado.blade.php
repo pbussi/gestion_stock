@@ -55,7 +55,7 @@
                      </tr>
                     @endforeach     
                       <tr style="height: 50px;  ">
-                        <td colspan=7 align=right class="text-success"><b>TOTAL:  $ <?php echo number_format($total,2,",","."); ?></b></td>
+                        <td colspan=7 align=right class="mb-4 mt-4"><h6 class="text-info font-weight-bold text-uppercase mt-3">TOTAL:  $ <?php echo number_format($total,2,",","."); ?></h6></td>
                       </tr>           
                   </tbody>
                 </table>

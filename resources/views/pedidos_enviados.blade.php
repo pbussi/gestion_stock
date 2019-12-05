@@ -19,7 +19,7 @@
                       <th scope="col">Numero</th>
                         <th>Fecha</th>
                         <th>Cliente</th>
-                        <th>$ Total </th>         
+                        <th style="text-align:right;">$ Total </th>         
                         <th class="w-10">Accion</th>
                     </tr>
                   </thead>
@@ -33,7 +33,7 @@
                       </a></td>
                       <td class="date">{{date('d-m-Y', strtotime($p->fecha)) }}</td>
                       <td class="text-uppercase">{{ $p->razon_social }}</td>    
-                      <td align=left>$ {{$totales[$p->id]}} </td>
+                      <td style="text-align:right;">$  <?php echo number_format($totales[$p->id],2,",",".");?>  </td>
                       <td class="w-10"> 
                       <a href="{{ url('/venta_gestion',$p->id) }}" class="float-center">
                         <span class="icon text-secondary">

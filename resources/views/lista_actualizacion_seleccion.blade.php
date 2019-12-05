@@ -23,7 +23,7 @@
                 @endforeach
                 </select>
               </div>
-
+             
               <a href="#"  onclick="document.getElementById('lista_actualizacion_seleccion').submit();" class="btn btn-success btn-icon-split">
                <span class ="icon text-white-50">
                           <i class="fas fa-check-double"></i>

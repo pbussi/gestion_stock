@@ -38,7 +38,7 @@
                     <tr>
                       <th scope="row">{{ $s->codigo }}</th>
                       
-                      <td><a href="{{ url('/movimiento_producto',$s->id) }}"><b>{{ $s->nombre_prod }}</b></a></td>
+                      <td><a href="{{ url('/movimiento_producto',$s->producto) }}"><b>{{ $s->nombre_prod }}</b></a></td>
                       <td>{{ $s->marca }}</td>
                        <td>{{ $s->tipo }}</td>
                       <td>{{ $s->unidad_medida }}</td>

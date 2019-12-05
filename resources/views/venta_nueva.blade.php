@@ -28,9 +28,9 @@
        <div class="form-group row"> 
               <div class="col-sm-6 mb-3 mb-sm-0">
                  <label for="tipo_prod">Elija cliente</label>
-                 <select class="form-control" name=cliente>
+                 <select class="form-control text-uppercase" name=cliente>
                  @foreach ($clientes as $p)
-                  <option value={{$p->id}}>{{$p->razon_social}}</option>
+                  <option value={{$p->id}}>{{strtoupper($p->razon_social)}}</option>
                 @endforeach
               </select>
               </div>

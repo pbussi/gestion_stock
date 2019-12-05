@@ -157,7 +157,7 @@ Route::get('/stock_seleccion_deposito', function () {
 Route::post('/stock_seleccion_deposito', function () {
 	$deposito=DB::select("select * from depositos where id=?",[$_POST['dep']]);
 	$deposito=$deposito[0];
-	$saldos= DB::select("select *, t.nombre as tipo, p.nombre as nombre_prod from saldos s,productos p, tipo_producto t WHERE s.id_deposito=? and s.id_producto=p.id and t.id=p.tipo_producto_id and s.cantidad>0 order by p.nombre",[$_POST['dep']]);
+	$saldos= DB::select("select *, t.nombre as tipo, p.id as producto,p.nombre as nombre_prod from saldos s,productos p, tipo_producto t WHERE s.id_deposito=? and s.id_producto=p.id and t.id=p.tipo_producto_id and s.cantidad>0 order by p.nombre",[$_POST['dep']]);
 		return view('stock_deposito',['deposito'=>$deposito,'saldos'=>$saldos]);	
 })->name('stock_deposito');
 

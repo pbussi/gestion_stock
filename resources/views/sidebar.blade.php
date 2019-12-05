@@ -45,16 +45,7 @@
             <a class="collapse-item" href="{{ url('/movimiento_mp_ingreso_seleccion') }}">Ingresos </a>
             <a class="collapse-item" href="{{ url('/movimiento_mp_salida_seleccion') }}">Transferencias</a>
             <a class="collapse-item" href="{{url('/movimiento_descarte_seleccion')}}">Salidas</a>
-            <h6 class="collapse-header">Informes</h6>
-             <a class="collapse-item" href={{ url('/stock_seleccion_deposito') }}>Stock por deposito</a>
-             <a class="collapse-item" href={{ url('/saldos_a_fecha') }}>Stock a fecha</a>
-             <a class="collapse-item" href={{ url('/stock_por_agrupacion_seleccion')}}>Stock por agrupacion</a>
-            <a class="collapse-item" href={{ url('/control_vencimientos_seleccion') }}>Control Vencimientos</a>
-
-           <h6 class="collapse-header">Valorizacion</h6>
-            <a class="collapse-item" href="{{ url('/stock_valorizado') }}">Existencias</a>
-            <a class="collapse-item" href="{{ url('/stock_punto_pedido') }}">Stock Min/Max/Pto Pedido</a>
-            <a class="collapse-item" href="{{ url('/productos_sin_stock_seleccion') }}">Productos sin stock</a>
+          
      
           </div>
         </div>
@@ -90,13 +81,44 @@
             <h5 class="collapse-header">Listas de Precios</h5>
             <a class="collapse-item" href="{{ url('/listas') }}">Listas de Precios</a>
             <a class="collapse-item" href="{{ url('lista_actualizacion_seleccion')}}">Actualización</a>
-            <a class="collapse-item" href="utilities-animation.html">Informes</a>
+            
 
-            <h6 class="collapse-header">Ventas</h6>
-            <a class="collapse-item" href={{ url('/venta_nueva')}}>Ingreso Pedido</a>
+            <h6 class="collapse-header">Pedidos</h6>
+            <a class="collapse-item" href={{ url('/venta_nueva')}}>Ingreso Pedidos</a>
             <a class="collapse-item" href={{ url('/pedidos_listado')}}>Pedidos Pendientes</a>
             <a class="collapse-item" href={{ url('/pedidos_enviados')}}>Pedidos Enviados</a>
             
+            
+            
+          </div>
+        </div>
+      </li>
+
+       <!-- Nav Item - Pages Collapse Menu -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseInformes" aria-expanded="true" aria-controls="collapseInformes">
+          <i class="fas fa-fw fa-cubes"></i>
+          <span>Informes</span>
+        </a>
+
+        <div id="collapseInformes" class="collapse" aria-labelledby="headingInformes" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+              <h5 class="collapse-header">STOCK</h5>
+                 <a class="collapse-item" href={{ url('/stock_seleccion_deposito') }}>Por deposito</a>
+                 <a class="collapse-item" href={{ url('/saldos_a_fecha') }}>A fecha</a>
+                 <a class="collapse-item" href={{ url('/stock_por_agrupacion_seleccion')}}>Por agrupacion</a>
+                 <a class="collapse-item" href="{{ url('/stock_punto_pedido') }}">Minimo/Max/Pto Pedido</a>
+                 <a class="collapse-item" href="{{ url('/productos_sin_stock_seleccion') }}">Productos sin stock</a>  
+                 <a class="collapse-item" href="{{ url('/stock_valorizado') }}">Valorización Existencias</a>       
+                 <a class="collapse-item" href={{ url('/estadistica_productos_seleccion')}}>Ranking Productos</a>
+                 <a class="collapse-item" href={{ url('/control_vencimientos_seleccion') }}>Control Vencimientos</a>
+              <h5 class="collapse-header">VENTAS</h5>
+                 <a class="collapse-item" href={{ url('/ventas_seleccion')}}>Resumen de Ventas</a>
+                 <a class="collapse-item" href={{ url('/ranking_ventas_seleccion')}}>Ranking de Ventas</a>
+                 <a class="collapse-item" href={{ url('/estadistica_productos_seleccion')}}>Ranking Productos</a>
+                 <a class="collapse-item" href={{ url('/pedidos_seleccion_cliente')}}>Ventas por Cliente</a>
+                 <a class="collapse-item" href={{ url('/ventas_no_cumplidas_seleccion')}}>Ventas no cumplidas</a>
+                  <a class="collapse-item" href={{ url('/ventasxlote_seleccion')}}>Ventas de lote específico</a>
           </div>
         </div>
       </li>
@@ -104,31 +126,7 @@
       <!-- Divider -->
       <hr class="sidebar-divider">
 
-      <!-- Heading -->
-      <div class="sidebar-heading">
-        Addons
-      </div>
-      <!-- Nav Item - Charts -->
-      <li class="nav-item">
-        <a class="nav-link" href="charts.html">
-          <i class="fas fa-fw fa-chart-area"></i>
-          <span>Charts</span></a>
-      </li>
-
-      <!-- Nav Item - Tables -->
-      <li class="nav-item">
-        <a class="nav-link" href="tables.html">
-          <i class="fas fa-fw fa-table"></i>
-          <span>Tables</span></a>
-      </li>
-
-      <!-- Divider -->
-      <hr class="sidebar-divider d-none d-md-block">
-
-      <!-- Sidebar Toggler (Sidebar) -->
-      <div class="text-center d-none d-md-inline">
-        <button class="rounded-circle border-0" id="sidebarToggle"></button>
-      </div>
+     
 
     </ul>
 
