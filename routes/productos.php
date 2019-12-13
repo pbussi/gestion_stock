@@ -115,6 +115,80 @@ Route::post('/producto_edit', function () {
 
 
 
+Route::get('/productos_pdf', function () {
+	
+	$clientes = DB::select("select p.codigo, p.nombre, p.marca, p.precio_costo, p.unidad_medida, t.nombre as tipo from productos p, tipo_producto t where p.tipo_producto_id=t.id order by tipo");
+	
+	$matriz=array();
+	foreach ($clientes as $c) {
+		$matriz[$c->id]['codigo']=$c->id;
+		$matriz[$c->id]['razon_social']=$c->razon_social;
+		$matriz[$c->id]['cuit']=$c->cuit;
+		$matriz[$c->id]['situacion_iva']=$c->situacion;
+		$matriz[$c->id]['direccion']=$c->direccion;
+		$matriz[$c->id]['localidad']=$c->localidad;		
+		$matriz[$c->id]['provincia']=$c->provincia;		
+		$matriz[$c->id]['telefono']=$c->telefono;	
+		$matriz[$c->id]['mail']=$c->mail;
+		$matriz[$c->id]['lista_asociada']=$c->nombre_lista;					
+		
+	}
+	
+    require('mc_table.php');
+	$pdf=new PDF_MC_Table();
+    $pdf->AddPage('L', 'A4');
+	$pdf->SetFont('Arial','',12);
+	$pdf->Write(5,"Listado de Clientes Heladeria Rincon.  Fecha:".date("d/m/Y",time()));
+
+	$pdf->Ln();
+	$pdf->Ln();
+	$pdf->SetFont('Arial','',8);
+	$cols=array(10);$titulos=array("");$aligns=array("L");
+	
+
+
+
+	$cols[]=40;$titulos[]="Razon Social";$aligns[]="L";
+	$cols[]=35;$titulos[]="Situacion IVA";$aligns[]="L";
+	$cols[]=30;$titulos[]="Direccion";$aligns[]="L";
+	$cols[]=30;$titulos[]="Localidad";$aligns[]="L";
+	$cols[]=30;$titulos[]="Provincia";$aligns[]="L";
+	$cols[]=20;$titulos[]="Telefono";$aligns[]="L";
+	$cols[]=40;$titulos[]="mail";$aligns[]="L";
+	$cols[]=45;$titulos[]="Lista Asociada";$aligns[]="L";
+	
+	
+	
+	
+
+	$pdf->SetWidths($cols);$pdf->SetAligns($aligns);
+	$pdf->Row($titulos);
+
+	foreach($matriz as $m){
+
+		$row=array($m['codigo']);
+
+		$row[]=$m['razon_social'];
+		$row[]=$m['situacion_iva'];
+		$row[]=$m['direccion'];
+		$row[]=$m['localidad'];
+		$row[]=$m['provincia'];
+		$row[]=$m['telefono'];
+		$row[]=$m['mail'];
+		$row[]=$m['lista_asociada'];
+
+
+		
+		
+	
+	    $pdf->Row($row);
+	}
+
+	
+	$pdf->Output("D","productos.pdf");
+})->name('productos_pdf');
+
+
 
 ///////////////// APIS
 

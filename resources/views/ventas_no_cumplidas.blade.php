@@ -47,7 +47,7 @@
                       </tr>
                        @endforeach
                      </tbody> 
-                     <tr><td colspan="7" style="text-align:right;">Ventas Perdidas de {{$producto}}  : <b><?php echo number_format($difSubtot,2,".",","); ?></b></td></tr>
+                     <tr><td colspan="6" style="text-align:right;">Ventas Perdidas de {{$producto}}  : <b><?php echo number_format($difSubtot,2,".",","); ?></b></td></tr>
                 </table>
               </div>
                     @endforeach
