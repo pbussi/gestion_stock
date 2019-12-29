@@ -13,18 +13,18 @@
  <form class="user" action="{{ url('/producto_nuevo') }}" id=nuevo_prod method=POST>
       @csrf
         <div class="form-group">
-          <input class="form-control"  type="text" placeholder="Codigo (de barra)" name=codigo>
+          <input class="form-control"  type="text" placeholder="Codigo (de barra)" name=codigo id=codigo>
         </div>
 
          <div class="form-group row">
             <div class="col-sm-6 mb-3 mb-sm-0">
-              <input class="form-control" type="text" placeholder="Nombre" name=nombre>
+              <input class="form-control" type="text" placeholder="Nombre" name=nombre id=nombre>
             </div>
             <div class="col-sm-3">
               <input class="form-control" type="text" placeholder="Marca" name=marca>
             </div>
             <div class="col-sm-3 mb-3 mb-sm-0">
-               <input class="form-control" type="text" placeholder="Unidad de Medida" name=unidad_medida>
+               <input class="form-control" type="text" placeholder="Unidad de Medida" name=unidad_medida id=unidad_medida>
             </div>
         </div>
          <div class="form-group row">
@@ -47,20 +47,20 @@
               <div class="col-sm-4 mb-3 mb-sm-0">
            
                   <label for="stkmin">Stock Minimo</label>
-                  <input class="form-control" type="text" placeholder="" name=stock_minimo>
+                  <input class="form-control" type="number" min=0 placeholder="" name=stock_minimo id=stock_minimo>
               </div>
                <div class="col-sm-4 mb-3 mb-sm-0"> 
                 <label for="stkmax">Stock Maximo</label>
-                <input class="form-control" type="text" placeholder=""  name=stock_maximo>
+                <input class="form-control" type="number" min=0 placeholder=""  name=stock_maximo id=stock_maximo>
               </div>
               <div class="col-sm-4 mb-3 mb-sm-0"> 
                  <label for="stkmin">Punto de Pedido</label>
-                <input class="form-control" type="text" placeholder=""  name=punto_pedido>
+                <input class="form-control" type="number" min=0 placeholder=""  name=punto_pedido id=punto_pedido>
               </div>
             </div>
           <div class="form-group row"> 
             <div class="col-sm-4 mb-3 mb-sm-0">
-             <input class="form-control" type="text" pattern="^\$\d{1,3}(,\d{3})*(\.\d+)?$" value="" data-type="currency" placeholder="Precio de Costo" name=precio_costo>
+             <input class="form-control" type="text" pattern="^\$\d{1,3}(,\d{3})*(\.\d+)?$" value="" data-type="currency" placeholder="Precio de Costo" name=precio_costo id=precio_costo>
          </div>
        </div>
         <div class="form-group row"> 
@@ -72,7 +72,41 @@
       </div>
        <div class="form-group row"> 
             <div class="col-sm-4 mb-3 mb-sm-0">
-              <a href="#"  onclick="document.getElementById('nuevo_prod').submit();" class="btn btn-success btn-icon-split">
+              <a href="#"  onclick="
+              if (!(document.getElementById('codigo').value != '')){
+                alert('ingrese codigo del producto');
+                return false;
+              }
+
+               if (!(document.getElementById('nombre').value != '')){
+                alert('ingrese Nombre del Producto');
+                return false;
+              }
+                if (!(document.getElementById('unidad_medida').value != '')){
+                alert('ingrese unidad de Medida del Producto');
+                return false;
+              }
+
+              if (!(document.getElementById('stock_minimo').value>0)){
+                alert('ingrese stock Minimo');
+                return false;
+              }
+               if (!(document.getElementById('stock_maximo').value>0)){
+                alert('ingrese stock Maximo');
+                return false;
+              }
+               if (!(document.getElementById('punto_pedido').value>0)){
+                alert('ingrese Punto de Pedido');
+                return false;
+              }
+               if (!(document.getElementById('precio_costo').value!='')){
+                alert('ingrese Precio de Costo');
+                return false;
+              }
+
+              document.getElementById('nuevo_prod').submit();
+
+              " class="btn btn-success btn-icon-split">
                <span class ="icon text-white-50">
                           <i class="fas fa-check-double"></i>
                </span>

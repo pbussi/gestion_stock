@@ -4,10 +4,9 @@
         <div class="container-fluid">
           <!-- Page Heading -->
           <h1 class="h3 mb-2 text-gray-800">{{$titulos[0]}}</h1>
-          <p class="mb-4">{{$titulos[1]}}</p>
           <!-- DataTales Example -->
           <div class="card shadow mb-4">
-            <div class="card-header py-3">
+            <div class="card-header py-4">
               <h6 class="m-0 font-weight-bold text-primary">{{$titulos[2]}}
 <a href="{{ url('/productos_saldos_pdf') }}?tipo=<?php echo Request::path(); ?>" class=" btn btn-warning btn-icon-split float-right" style="margin-left: 10px;">
                     <span class="icon text-white-50">
@@ -15,12 +14,19 @@
                     </span>
                     <span class="text">Saldos</span>
                   </a>
-              <a href="{{ url('/producto_nuevo') }}"  class=" btn btn-success btn-icon-split float-right">
+              <a href="{{ url('/producto_nuevo') }}"  class=" btn btn-success btn-icon-split float-right" style="margin-left: 10px;">
                     <span class="icon text-white-50">
                       <i class="fas fa-check-double"></i>
                     </span>
                     <span class="text">Crear nuevo</span>
                   </a>
+ <a href="{{ url('/productos_pdf') }}?tipo=<?php echo Request::path(); ?>" class=" btn btn-info btn-icon-split float-right">
+                    <span class="icon text-white-50">
+                      <i class="fas fa-file-pdf"></i>
+                    </span>
+                    <span class="text">Catalogo</span>
+                  </a>
+                   
                  
            </h6>
             </div>

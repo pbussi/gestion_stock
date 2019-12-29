@@ -17,7 +17,7 @@ require_once('depositos.php');
 require_once('movimientos_mp.php');*/
 
 Route::get('/', function () {
-	$ventas=DB::select("SELECT sum(total) as total FROM vista_ventas 
+	$ventas=DB::select("SELECT sum(total) as total FROM ".$GLOBALS['vista_ventas']." vista_ventas 
 		where month(fecha)=month(now()) ");
 	$ventas=$ventas[0]->total;
 	$pendientes=DB::select("select count(*) as cant FROM ventas where estado in (0,1)");

@@ -78,11 +78,11 @@ Route::get('/producto_nuevo', function () {
 })->name('producto_nuevo');
 
 Route::post('/producto_nuevo', function () {
-	//print_r($_POST);
+	$precio_costo=str_replace(",", ".", $_POST['precio_costo']);
 	$imagen='';
 	if (isset($_POST['lleva_stock'])) $lleva_stock=1; else $lleva_stock=0;
 	try {
-	DB::select('insert into productos values (NULL,?,?,?,?,?,?,?,?,?,?,?)',[$_POST['codigo'],$_POST['nombre'],$_POST['marca'],$_POST['precio_costo'],$lleva_stock,$_POST['stock_minimo'],$_POST['stock_maximo'],$_POST['punto_pedido'],$_POST['unidad_medida'],$imagen,$_POST['tipo_producto_id'] ]);
+	DB::select('insert into productos values (NULL,?,?,?,?,?,?,?,?,?,?,?)',[$_POST['codigo'],$_POST['nombre'],$_POST['marca'],$precio_costo,$lleva_stock,$_POST['stock_minimo'],$_POST['stock_maximo'],$_POST['punto_pedido'],$_POST['unidad_medida'],$imagen,$_POST['tipo_producto_id'] ]);
 	}
 	catch (Exception $e){
 		return redirect()->route('producto_nuevo')->with('error',"No se puede crear el item:".$e->getMessage());
@@ -100,12 +100,13 @@ Route::get('/producto_edit/{id}', function ($id) {
 });
 
 Route::post('/producto_edit', function () {
+	$precio_costo=str_replace(",", ".", $_POST['precio_costo']);
 	if (isset($_POST['lleva_stock'])) $lleva_stock=1; else $lleva_stock=0;
 	if ($_FILES['foto']['tmp_name']!=''){
 		$foto=file_get_contents($_FILES['foto']['tmp_name']);
 		$productos = DB::select('update productos set imagen=? where id=?',[$foto,$_POST['id']]);
 	}
-	$productos = DB::select('update productos set nombre=?,marca=?, unidad_medida=?,lleva_stock=?,tipo_producto_id=?,stock_minimo=?,stock_maximo=?,punto_pedido=?,precio_costo=? where id=?',[$_POST['nombre'],$_POST['marca'], $_POST['unidad_medida'], $lleva_stock,$_POST['tipo_producto_id'],$_POST['stock_minimo'],$_POST['stock_maximo'],$_POST['punto_pedido'],$_POST['precio_costo'],$_POST['id']]);
+	$productos = DB::select('update productos set nombre=?,marca=?, unidad_medida=?,lleva_stock=?,tipo_producto_id=?,stock_minimo=?,stock_maximo=?,punto_pedido=?,precio_costo=? where id=?',[$_POST['nombre'],$_POST['marca'], $_POST['unidad_medida'], $lleva_stock,$_POST['tipo_producto_id'],$_POST['stock_minimo'],$_POST['stock_maximo'],$_POST['punto_pedido'],$precio_costo,$_POST['id']]);
     if(in_array($_POST['tipo_producto_id'],array(1,2,3,6,8) )) 
 	    	return redirect()->route('productos')->with('success','Item actualizado!'); 
 	else
@@ -116,46 +117,43 @@ Route::post('/producto_edit', function () {
 
 
 Route::get('/productos_pdf', function () {
+	if ($_GET['tipo']=="insumos") $conjunto="p.tipo_producto_id in (4,7)";
+	else $conjunto="p.tipo_producto_id not in (4,7)";
 	
-	$clientes = DB::select("select p.codigo, p.nombre, p.marca, p.precio_costo, p.unidad_medida, t.nombre as tipo from productos p, tipo_producto t where p.tipo_producto_id=t.id order by tipo");
+	$productos = DB::select("select p.id, p.codigo, p.nombre, p.marca, p.precio_costo, p.unidad_medida, t.nombre as tipo from productos p, tipo_producto t where p.tipo_producto_id=t.id and ".$conjunto." order by t.nombre;");
 	
 	$matriz=array();
-	foreach ($clientes as $c) {
-		$matriz[$c->id]['codigo']=$c->id;
-		$matriz[$c->id]['razon_social']=$c->razon_social;
-		$matriz[$c->id]['cuit']=$c->cuit;
-		$matriz[$c->id]['situacion_iva']=$c->situacion;
-		$matriz[$c->id]['direccion']=$c->direccion;
-		$matriz[$c->id]['localidad']=$c->localidad;		
-		$matriz[$c->id]['provincia']=$c->provincia;		
-		$matriz[$c->id]['telefono']=$c->telefono;	
-		$matriz[$c->id]['mail']=$c->mail;
-		$matriz[$c->id]['lista_asociada']=$c->nombre_lista;					
-		
+	foreach ($productos as $c) {
+		$matriz[$c->id]['codigo']=$c->codigo;
+		$matriz[$c->id]['nombre']=$c->nombre;
+		$matriz[$c->id]['marca']=$c->marca;
+		$matriz[$c->id]['unidad_medida']=$c->unidad_medida;
+		$matriz[$c->id]['tipo']=$c->tipo;		
+							
 	}
 	
     require('mc_table.php');
 	$pdf=new PDF_MC_Table();
-    $pdf->AddPage('L', 'A4');
+    $pdf->AddPage();
 	$pdf->SetFont('Arial','',12);
-	$pdf->Write(5,"Listado de Clientes Heladeria Rincon.  Fecha:".date("d/m/Y",time()));
+	$pdf->Write(5,"Listado de Sabores y Productos Heladeria Rincon.  Fecha:".date("d/m/Y",time()));
 
 	$pdf->Ln();
 	$pdf->Ln();
-	$pdf->SetFont('Arial','',8);
-	$cols=array(10);$titulos=array("");$aligns=array("L");
+	$pdf->SetFont('Arial','',9);
+	$cols=array();$titulos=array();
+	//$aligns=array("L");
 	
 
 
 
-	$cols[]=40;$titulos[]="Razon Social";$aligns[]="L";
-	$cols[]=35;$titulos[]="Situacion IVA";$aligns[]="L";
-	$cols[]=30;$titulos[]="Direccion";$aligns[]="L";
-	$cols[]=30;$titulos[]="Localidad";$aligns[]="L";
-	$cols[]=30;$titulos[]="Provincia";$aligns[]="L";
-	$cols[]=20;$titulos[]="Telefono";$aligns[]="L";
-	$cols[]=40;$titulos[]="mail";$aligns[]="L";
-	$cols[]=45;$titulos[]="Lista Asociada";$aligns[]="L";
+	$cols[]=30;$titulos[]="CODIGO";$aligns[]="L";
+	$cols[]=70;$titulos[]="NOMBRE";$aligns[]="L";
+	$cols[]=30;$titulos[]="MARCA";$aligns[]="L";
+	$cols[]=20;$titulos[]="U.M.";$aligns[]="L";
+	
+	$cols[]=30;$titulos[]="TIPO PRODUCTO";$aligns[]="C";
+	
 	
 	
 	
@@ -166,21 +164,12 @@ Route::get('/productos_pdf', function () {
 
 	foreach($matriz as $m){
 
-		$row=array($m['codigo']);
-
-		$row[]=$m['razon_social'];
-		$row[]=$m['situacion_iva'];
-		$row[]=$m['direccion'];
-		$row[]=$m['localidad'];
-		$row[]=$m['provincia'];
-		$row[]=$m['telefono'];
-		$row[]=$m['mail'];
-		$row[]=$m['lista_asociada'];
-
-
+		$row=array($m['codigo']);	
+		$row[]=$m['nombre'];
+		$row[]=$m['marca'];
+		$row[]=$m['unidad_medida'];
 		
-		
-	
+		$row[]=$m['tipo'];
 	    $pdf->Row($row);
 	}
 
@@ -196,7 +185,7 @@ Route::get('/productos_pdf', function () {
 Route::get('/producto_depositos_saldo/{id}', function ($id) {
 
 	/*$depositos_saldo= DB::select('select d.id as id_deposito,d.nombre,sum(cantidad) from lotes_mp mp, movimientos m,depositos d where mp.productos_id=? and mp.id=m.lotes_mp_id and m.depositos_id=d.id group by d.id,d.nombre  having sum(cantidad)>0',[$id]);*/
-	$depositos_saldo= DB::select('select depositos_id as id_deposito,deposito as nombre,sum(cantidad) from vista_movimientos where productos_id=? group by depositos_id,deposito  having sum(cantidad)>0',[$id]);
+	$depositos_saldo= DB::select('select depositos_id as id_deposito,deposito as nombre,sum(cantidad) from '.$GLOBALS['vista_movimientos'].' v where productos_id=? group by depositos_id,deposito  having sum(cantidad)>0',[$id]);
 	return \Response::json($depositos_saldo, 200);
 
 });
@@ -214,7 +203,7 @@ Route::get('/producto_lotes_saldo/{id_producto}/{id_deposito}', function ($id_pr
 
 Route::get('/producto_lotes_venta_saldo/{id_producto}/{id_deposito}', function ($id_producto,$id_deposito) {
 
-	$depositos_saldo= DB::select('select lotes_mp_id,productos_lote_produccion_id,lote,sum(cantidad) as cantidad from vista_movimientos where depositos_id=? and productos_id=?  group by lotes_mp_id,productos_lote_produccion_id,lote having sum(cantidad)>0',[$id_deposito,$id_producto]);
+	$depositos_saldo= DB::select('select lotes_mp_id,productos_lote_produccion_id,lote,sum(cantidad) as cantidad from '.$GLOBALS['vista_movimientos'].' m where depositos_id=? and productos_id=?  group by lotes_mp_id,productos_lote_produccion_id,lote having sum(cantidad)>0',[$id_deposito,$id_producto]);
 	return \Response::json($depositos_saldo, 200);
 
 });
@@ -229,8 +218,19 @@ Route::get('/stock_seleccion_deposito', function () {
 
 
 Route::post('/stock_seleccion_deposito', function () {
+	DB::table('saldos')->truncate();
+	$x=DB::select("select productos_id,depositos_id,sum(cantidad) as cantidad from ".$GLOBALS['vista_movimientos']." v group by productos_id,depositos_id");
+	$ar=array();
+	foreach($x as $a) 
+		$ar[]=["id_producto"=>$a->productos_id,"id_deposito"=>$a->depositos_id,"cantidad"=>$a->cantidad];
+	DB::table('saldos')->insert($ar);
+
 	$deposito=DB::select("select * from depositos where id=?",[$_POST['dep']]);
 	$deposito=$deposito[0];
+
+	
+
+
 	$saldos= DB::select("select *, t.nombre as tipo, p.id as producto,p.nombre as nombre_prod from saldos s,productos p, tipo_producto t WHERE s.id_deposito=? and s.id_producto=p.id and t.id=p.tipo_producto_id and s.cantidad>0 order by p.nombre",[$_POST['dep']]);
 		return view('stock_deposito',['deposito'=>$deposito,'saldos'=>$saldos]);	
 })->name('stock_deposito');
@@ -240,6 +240,13 @@ Route::post('/stock_seleccion_deposito', function () {
 
 
 Route::get('/stock_seleccion_deposito_pdf/{id}', function ($id) {
+	DB::table('saldos')->truncate();
+	$x=DB::select("select productos_id,depositos_id,sum(cantidad) as cantidad from ".$GLOBALS['vista_movimientos']." v group by productos_id,depositos_id");
+	$ar=array();
+	foreach($x as $a) 
+		$ar[]=["id_producto"=>$a->productos_id,"id_deposito"=>$a->depositos_id,"cantidad"=>$a->cantidad];
+	DB::table('saldos')->insert($ar);
+
 	$prodsxdep = DB::select("select s.id_producto,s.id_deposito,s.cantidad, p.nombre, p.marca, p.unidad_medida, d.nombre as deposito, t.nombre as tipo from saldos s, productos p, depositos d, tipo_producto t WHERE s.id_deposito=? and s.id_deposito=d.id and s.id_producto=p.id and p.tipo_producto_id=t.id and s.cantidad>0; ",[$id]);
 	$deposito=DB::select("select * from depositos where id=?",[$id]);
 	$deposito=$deposito[0];
@@ -296,7 +303,13 @@ Route::get('/stock_seleccion_deposito_pdf/{id}', function ($id) {
 
 
 Route::get('/saldos_a_fecha', function () {
-	
+	DB::table('saldos')->truncate();
+	$x=DB::select("select productos_id,depositos_id,sum(cantidad) as cantidad from ".$GLOBALS['vista_movimientos']." v group by productos_id,depositos_id");
+	$ar=array();
+	foreach($x as $a) 
+		$ar[]=["id_producto"=>$a->productos_id,"id_deposito"=>$a->depositos_id,"cantidad"=>$a->cantidad];
+	DB::table('saldos')->insert($ar);
+
 	$stock = DB::select("select p.nombre, p.marca, p.unidad_medida, s.id_producto, sum(cantidad) as cantidad  from saldos s, productos p where s.id_producto=p.id group by p.nombre, p.marca, p.unidad_medida, s.id_producto order by p.nombre asc;",[]);
 
     return view('saldos_a_fecha',['stock'=>$stock]);
@@ -304,6 +317,13 @@ Route::get('/saldos_a_fecha', function () {
 
 
 Route::get('/saldos_a_fecha_pdf/', function () {
+	DB::table('saldos')->truncate();
+	$x=DB::select("select productos_id,depositos_id,sum(cantidad) as cantidad from ".$GLOBALS['vista_movimientos']." v group by productos_id,depositos_id");
+	$ar=array();
+	foreach($x as $a) 
+		$ar[]=["id_producto"=>$a->productos_id,"id_deposito"=>$a->depositos_id,"cantidad"=>$a->cantidad];
+	DB::table('saldos')->insert($ar);
+
 	$stock = DB::select("select p.nombre, p.marca, p.unidad_medida, s.id_producto, sum(cantidad) as cantidad  from saldos s, productos p where s.id_producto=p.id group by p.nombre, p.marca, p.unidad_medida, s.id_producto;",[]);
 	
 
@@ -361,6 +381,13 @@ Route::get('/stock_por_agrupacion_seleccion', function () {
 
 
 Route::post('/stock_por_agrupacion_seleccion', function () {
+	DB::table('saldos')->truncate();
+	$x=DB::select("select productos_id,depositos_id,sum(cantidad) as cantidad from ".$GLOBALS['vista_movimientos']." v group by productos_id,depositos_id");
+	$ar=array();
+	foreach($x as $a) 
+		$ar[]=["id_producto"=>$a->productos_id,"id_deposito"=>$a->depositos_id,"cantidad"=>$a->cantidad];
+	DB::table('saldos')->insert($ar);
+
 	$titulo=$_POST['grupo'];
 	if ($_POST['grupo']=="Productos para la Venta") {
 		$g=1;
@@ -375,6 +402,13 @@ Route::post('/stock_por_agrupacion_seleccion', function () {
 
 
 Route::get('/stock_por_agrupacion_pdf/{grupo}', function ($grupo) {
+	DB::table('saldos')->truncate();
+	$x=DB::select("select productos_id,depositos_id,sum(cantidad) as cantidad from ".$GLOBALS['vista_movimientos']." v group by productos_id,depositos_id");
+	$ar=array();
+	foreach($x as $a) 
+		$ar[]=["id_producto"=>$a->productos_id,"id_deposito"=>$a->depositos_id,"cantidad"=>$a->cantidad];
+	DB::table('saldos')->insert($ar);
+
 	if ($grupo==1) {
 		$saldos=DB::select("select p.codigo,p.nombre, p.marca, p.unidad_medida, s.id_producto, t.nombre as tipo_producto, sum(cantidad) as cantidad  from saldos s, productos p, tipo_producto as t where p.tipo_producto_id not in (4,7) and s.id_producto=p.id and t.id=p.tipo_producto_id group by p.codigo,p.nombre, p.marca, p.unidad_medida, s.id_producto, t.nombre",[]); $titulo="PRODUCTOS PARA LA VENTA";
 	}
@@ -434,7 +468,13 @@ Route::get('/stock_por_agrupacion_pdf/{grupo}', function ($grupo) {
 
 
 Route::get('/stock_valorizado', function () {
-	
+	DB::table('saldos')->truncate();
+	$x=DB::select("select productos_id,depositos_id,sum(cantidad) as cantidad from ".$GLOBALS['vista_movimientos']." v group by productos_id,depositos_id");
+	$ar=array();
+	foreach($x as $a) 
+		$ar[]=["id_producto"=>$a->productos_id,"id_deposito"=>$a->depositos_id,"cantidad"=>$a->cantidad];
+	DB::table('saldos')->insert($ar);
+
 	$stock = DB::select("select p.nombre, p.marca, p.unidad_medida, p.precio_costo, s.id_producto, p.precio_costo*sum(cantidad) as total,sum(cantidad) as cantidad from saldos s, productos p where s.id_producto=p.id group by p.nombre, p.marca, p.unidad_medida, s.id_producto order by p.nombre asc;",[]);
 
 
@@ -444,6 +484,13 @@ Route::get('/stock_valorizado', function () {
 
 
 Route::get('/stock_valorizado_pdf/', function () {
+	DB::table('saldos')->truncate();
+	$x=DB::select("select productos_id,depositos_id,sum(cantidad) as cantidad from ".$GLOBALS['vista_movimientos']." v group by productos_id,depositos_id");
+	$ar=array();
+	foreach($x as $a) 
+		$ar[]=["id_producto"=>$a->productos_id,"id_deposito"=>$a->depositos_id,"cantidad"=>$a->cantidad];
+	DB::table('saldos')->insert($ar);
+
 	$stock = DB::select("select p.nombre, p.marca, p.unidad_medida, p.precio_costo, s.id_producto, p.precio_costo*sum(cantidad) as total,sum(cantidad) as cantidad from saldos s, productos p where s.id_producto=p.id group by p.nombre, p.marca, p.unidad_medida, s.id_producto order by p.nombre asc;",[]);
 
 	$matriz=array();
@@ -505,7 +552,13 @@ Route::get('/stock_valorizado_pdf/', function () {
 
 
 Route::get('/stock_punto_pedido', function () {
-	
+	DB::table('saldos')->truncate();
+	$x=DB::select("select productos_id,depositos_id,sum(cantidad) as cantidad from ".$GLOBALS['vista_movimientos']." v group by productos_id,depositos_id");
+	$ar=array();
+	foreach($x as $a) 
+		$ar[]=["id_producto"=>$a->productos_id,"id_deposito"=>$a->depositos_id,"cantidad"=>$a->cantidad];
+	DB::table('saldos')->insert($ar);
+
 	$stock = DB::select("select p.nombre, p.marca, p.unidad_medida,p.stock_minimo,p.punto_pedido,p.stock_maximo,s.id_producto, p.tipo_producto_id,sum(cantidad) as cantidad from saldos s, productos p where s.id_producto=p.id and p.lleva_stock=1 and cantidad<=p.punto_pedido group by p.nombre, p.marca, p.unidad_medida,p.stock_minimo,p.punto_pedido,p.stock_maximo,s.id_producto, p.tipo_producto_id order by p.nombre asc;",[]);
     return view('stock_punto_pedido',['stock'=>$stock]);
 })->name('stock_punto_pedido');
@@ -514,6 +567,13 @@ Route::get('/stock_punto_pedido', function () {
 
 
 Route::get('/saldos_bajo_punto_pedido_pdf/', function () {
+	DB::table('saldos')->truncate();
+	$x=DB::select("select productos_id,depositos_id,sum(cantidad) as cantidad from ".$GLOBALS['vista_movimientos']." v group by productos_id,depositos_id");
+	$ar=array();
+	foreach($x as $a) 
+		$ar[]=["id_producto"=>$a->productos_id,"id_deposito"=>$a->depositos_id,"cantidad"=>$a->cantidad];
+	DB::table('saldos')->insert($ar);
+
 	$stock = DB::select("select p.nombre, p.marca, p.unidad_medida,p.stock_minimo,p.punto_pedido,p.stock_maximo,s.id_producto, p.tipo_producto_id,sum(cantidad) as cantidad from saldos s, productos p where s.id_producto=p.id and p.lleva_stock=1 and cantidad<=p.punto_pedido group by p.nombre, p.marca, p.unidad_medida,p.stock_minimo,p.punto_pedido,p.stock_maximo,s.id_producto, p.tipo_producto_id order by p.nombre asc;",[]);
 	$matriz=array();
 	
@@ -579,6 +639,12 @@ Route::get('/productos_sin_stock_seleccion', function () {
 
 
 Route::post('/productos_sin_stock_seleccion', function () {
+	DB::table('saldos')->truncate();
+	$x=DB::select("select productos_id,depositos_id,sum(cantidad) as cantidad from ".$GLOBALS['vista_movimientos']." v group by productos_id,depositos_id");
+	$ar=array();
+	foreach($x as $a) 
+		$ar[]=["id_producto"=>$a->productos_id,"id_deposito"=>$a->depositos_id,"cantidad"=>$a->cantidad];
+	DB::table('saldos')->insert($ar);
 
 
 	$titulo=$_POST['grupo'];
@@ -609,6 +675,12 @@ Route::get('/control_vencimientos_seleccion', function () {
 
 
 Route::post('/control_vencimientos_seleccion', function () {
+	DB::table('saldos')->truncate();
+	$x=DB::select("select productos_id,depositos_id,sum(cantidad) as cantidad from ".$GLOBALS['vista_movimientos']." v group by productos_id,depositos_id");
+	$ar=array();
+	foreach($x as $a) 
+		$ar[]=["id_producto"=>$a->productos_id,"id_deposito"=>$a->depositos_id,"cantidad"=>$a->cantidad];
+	DB::table('saldos')->insert($ar);
 
 
 	$titulo=$_POST['grupo'];
@@ -616,10 +688,10 @@ Route::post('/control_vencimientos_seleccion', function () {
 
 	if ($_POST['grupo']=="Productos para la Venta") {
 		$g=1;
-		$saldos=DB::select("select s.depositos_id, s.deposito, s.lote, s.vencimiento, p.id as codigo,p.nombre, p.marca, p.unidad_medida, t.nombre as tipo, sum(cantidad) as total from vista_movimientos s, productos p, tipo_producto t where s.productos_id=p.id and p.tipo_producto_id=t.id and t.id not in (4,7) group by s.depositos_id, s.deposito, s.lote, s.vencimiento, p.id,p.nombre, p.marca, p.unidad_medida, t.nombre having sum(cantidad)>0 order by s.vencimiento asc ",[]);}
+		$saldos=DB::select("select s.depositos_id, s.deposito, s.lote, s.vencimiento, p.id as codigo,p.nombre, p.marca, p.unidad_medida, t.nombre as tipo, sum(cantidad) as total from ".$GLOBALS['vista_movimientos']." s, productos p, tipo_producto t where s.productos_id=p.id and p.tipo_producto_id=t.id and t.id not in (4,7) group by s.depositos_id, s.deposito, s.lote, s.vencimiento, p.id,p.nombre, p.marca, p.unidad_medida, t.nombre having sum(cantidad)>0 order by s.vencimiento asc ",[]);}
 	else{
 		$g=2;
-		$saldos=DB::select("select s.depositos_id, s.deposito, s.lote, s.vencimiento, p.id as codigo, p.nombre, p.marca, p.unidad_medida, t.nombre as tipo, sum(cantidad) as total from vista_movimientos s, productos p, tipo_producto t where s.productos_id=p.id and p.tipo_producto_id=t.id and t.id in (4,7)  group by s.depositos_id, s.deposito, s.lote, s.vencimiento, p.id, p.nombre, p.marca, p.unidad_medida, t.nombre  having sum(cantidad)>0 order by s.vencimiento asc",[]);
+		$saldos=DB::select("select s.depositos_id, s.deposito, s.lote, s.vencimiento, p.id as codigo, p.nombre, p.marca, p.unidad_medida, t.nombre as tipo, sum(cantidad) as total from ".$GLOBALS['vista_movimientos']." s, productos p, tipo_producto t where s.productos_id=p.id and p.tipo_producto_id=t.id and t.id in (4,7)  group by s.depositos_id, s.deposito, s.lote, s.vencimiento, p.id, p.nombre, p.marca, p.unidad_medida, t.nombre  having sum(cantidad)>0 order by s.vencimiento asc",[]);
 	}
 
 

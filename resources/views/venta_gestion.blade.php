@@ -32,7 +32,7 @@
               @endif
           @endif
          </i> </h5>
-          @if ($venta->estado==1){
+          @if ($venta->estado==1)
            <a href="{{ url('/remitos_pdf',$venta->id) }}" class=" btn btn-warning btn-icon-split float-right" style="margin-left: 10px;">
               <span class="icon text-white-50">
                   <i class="fas fa-print"></i>
@@ -40,7 +40,7 @@
               <span class="text">Imprimir</span>
             </a>
           @endif
-           @if ($venta->estado==2){
+           @if ($venta->estado==2)
            <a href="{{ url('/remitos_pdf',$venta->id) }}" class=" btn btn-warning btn-icon-split float-right" style="margin-left: 10px;">
               <span class="icon text-white-50">
                   <i class="fas fa-print"></i>

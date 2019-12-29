@@ -2,7 +2,7 @@
 
 Route::get('/ventas/{id_venta}/{id_producto}', function ($id_venta,$id_producto) {
 if (isset($_GET['borrar']))	{
-	$mov=DB::select("SELECT vista_movimientos.id FROM vista_movimientos,item_venta where productos_id=? and vista_movimientos.id=item_venta.movimientos_id and ventas_id=?",[$id_producto,$id_venta]);
+	$mov=DB::select("SELECT vista_movimientos.id FROM ".$GLOBALS['vista_movimientos']." vista_movimientos,item_venta where productos_id=? and vista_movimientos.id=item_venta.movimientos_id and ventas_id=?",[$id_producto,$id_venta]);
 	foreach ($mov as $m){
 
 		DB::select("delete from item_venta where movimientos_id=?",[$m->id]);
@@ -30,6 +30,13 @@ Route::post('/venta_nueva', function () {
 })->name('venta_nueva');
 
 Route::get('/venta_gestion/{id}', function ($id) {
+	DB::table('saldos')->truncate();
+	$x=DB::select("select productos_id,depositos_id,sum(cantidad) as cantidad from ".$GLOBALS['vista_movimientos']." v group by productos_id,depositos_id");
+	$ar=array();
+	foreach($x as $a) 
+		$ar[]=["id_producto"=>$a->productos_id,"id_deposito"=>$a->depositos_id,"cantidad"=>$a->cantidad];
+	DB::table('saldos')->insert($ar);
+
 	$productos=DB::select("select * from productos where tipo_producto_id not in (4,7) and id not in (select producto_id from item_pedidos where venta_id=$id)");
 
 	$venta=DB::select("select v.id, v.fecha, v.lista_precios_id,v.clientes_id ,c.razon_social, l.nombre as lista_precios,v.estado from ventas v,clientes c,lista_precios l where v.clientes_id=c.id and v.lista_precios_id=l.id and v.id=$id");
@@ -41,9 +48,9 @@ Route::get('/venta_gestion/{id}', function ($id) {
 	$asignaciones=array();
 	foreach ($items_pedidos as $item) {
 		$lotes_disponibles[$item->id]=DB::select("SELECT d.id as id_deposito,d.nombre as nombre_deposito,lotes_mp_id as id_lote_mp,productos_lote_produccion_id as id_lote_produccion_id,lote as numero_lote,vencimiento, sum(cantidad) as saldo 
-		FROM vista_movimientos m,depositos d 
+		FROM ".$GLOBALS['vista_movimientos']." m,depositos d 
 		WHERE  m.depositos_id=d.id and d.id<>13 and productos_id=? group by d.id,d.nombre,lotes_mp_id,productos_lote_produccion_id,lote, vencimiento having sum(cantidad)>0 order by vencimiento asc",[$item->id]);
-		$asignaciones[$item->id]=DB::select("SELECT * from item_venta i,vista_movimientos v where i.movimientos_id=v.id and i.ventas_id=? and v.productos_id=?",[$id,$item->id]);
+		$asignaciones[$item->id]=DB::select("SELECT * from item_venta i,".$GLOBALS['vista_movimientos']." v where i.movimientos_id=v.id and i.ventas_id=? and v.productos_id=?",[$id,$item->id]);
 		$saldosxproducto[$item->id]= DB::select("select s.id_producto,s.cantidad,d.nombre,p.unidad_medida from saldos s,depositos d, productos p where s.id_producto=p.id and s.id_deposito=d.id and p.id=?;",[$item->id]);
 
 	}
@@ -83,7 +90,7 @@ Route::post('/asignar_lotes_venta/{id}', function ($id) {
 
 
 Route::get('/desasignar_lotes_venta/{venta_id}/{producto_id}', function ($venta_id,$producto_id) {
-	$mov=DB::select("SELECT vista_movimientos.id FROM vista_movimientos,item_venta where productos_id=? and vista_movimientos.id=item_venta.movimientos_id and ventas_id=?",[$producto_id,$venta_id]);
+	$mov=DB::select("SELECT vista_movimientos.id FROM ".$GLOBALS['vista_movimientos']."  vista_movimientos,item_venta where productos_id=? and vista_movimientos.id=item_venta.movimientos_id and ventas_id=?",[$producto_id,$venta_id]);
 	foreach ($mov as $m){
 		$x=DB::delete("delete from item_venta where movimientos_id=?",[$m->id]);
 		$x=DB::delete("delete from movimientos where id=?",[$m->id]);
@@ -135,7 +142,7 @@ function autoasignarlotes($id){
 	
 		$cantidad_asignar=$item->cantidad;
 		$lotes_disponibles=DB::select("SELECT d.id as id_deposito,d.nombre as nombre_deposito,lotes_mp_id as id_lote_mp,productos_lote_produccion_id as id_lote_produccion_id,lote as numero_lote,vencimiento, sum(cantidad) as saldo 
-			FROM vista_movimientos m,depositos d 
+			FROM ".$GLOBALS['vista_movimientos']."  m,depositos d 
 			WHERE  m.depositos_id=d.id and d.id<>13 and productos_id=? group by d.id,d.nombre,lotes_mp_id,productos_lote_produccion_id,lote, vencimiento having sum(cantidad)>0 order by vencimiento asc",[$item->producto_id]);
 		foreach ($lotes_disponibles as $lote){	
 			if ($cantidad_asignar>0){
@@ -161,7 +168,7 @@ Route::get('/pedidos_listado', function () {
 	if (isset($_GET['borrar']))
 	{
 	    $formulario="REM".str_pad($_GET['borrar'],6,"0", STR_PAD_LEFT);	
-		$mov=DB::select("SELECT vista_movimientos.id FROM vista_movimientos,item_venta where  vista_movimientos.id=item_venta.movimientos_id and ventas_id=?",[$_GET['borrar']]);
+		$mov=DB::select("SELECT vista_movimientos.id FROM ".$GLOBALS['vista_movimientos']." vista_movimientos,item_venta where  vista_movimientos.id=item_venta.movimientos_id and ventas_id=?",[$_GET['borrar']]);
 		foreach ($mov as $m){
 			$x=DB::delete("delete from item_venta where movimientos_id=?",[$m->id]);
 			$x=DB::delete("delete from movimientos where id=?",[$m->id]);
@@ -217,7 +224,7 @@ Route::post('/pedidos_seleccion_cliente',function () {
 	
 	foreach ($ventascliente as $v) {
 		$formulario="REM".str_pad($v->id,6,"0", STR_PAD_LEFT);	
-		$datos_ventas[$v->id]=DB::select("select m.cantidad, m.comprobante_asociado, m.productos_id, i.precio, p.nombre,i.precio*(-m.cantidad) as subtotal from vista_movimientos m, productos p, item_venta i where i.ventas_id=? and m.comprobante_asociado like ? and m.productos_id=p.id and i.movimientos_id=m.id;",[$v->id,$formulario]);		
+		$datos_ventas[$v->id]=DB::select("select m.cantidad, m.comprobante_asociado, m.productos_id, i.precio, p.nombre,i.precio*(-m.cantidad) as subtotal from ".$GLOBALS['vista_movimientos']."  m, productos p, item_venta i where i.ventas_id=? and m.comprobante_asociado like ? and m.productos_id=p.id and i.movimientos_id=m.id;",[$v->id,$formulario]);		
 	}
 	//print_r($datos_ventas);
 	
@@ -236,13 +243,13 @@ Route::post('/estadistica_productos_seleccion', function () {
 		if($valor=="1") {//historico
 			$desde="";
 			$hasta="";
-			$ranking=DB::select("select m.productos_id,p.nombre,p.unidad_medida, -sum(cantidad) as total_producto from vista_movimientos m,productos p where m.comprobante_asociado like 'REM%' and m.productos_id=p.id GROUP by m.productos_id,p.nombre, p.unidad_medida order by total_producto desc;");	
+			$ranking=DB::select("select m.productos_id,p.nombre,p.unidad_medida, -sum(cantidad) as total_producto from ".$GLOBALS['vista_movimientos']." m,productos p where m.comprobante_asociado like 'REM%' and m.productos_id=p.id GROUP by m.productos_id,p.nombre, p.unidad_medida order by total_producto desc;");	
 		}
 		else {
 
 			$desde=date('Y-m-d', strtotime($_POST['fecha_desde']));
 			$hasta=date('Y-m-d', strtotime($_POST['fecha_hasta']));
-			$ranking=DB::select("select m.productos_id,p.nombre, p.unidad_medida,-sum(cantidad) as total_producto from vista_movimientos m,productos p where m.comprobante_asociado like 'REM%' and m.productos_id=p.id and m.fecha>=? and m.fecha<=? GROUP by m.productos_id,p.nombre, p.unidad_medida order by total_producto desc;",[$desde,$hasta]);	
+			$ranking=DB::select("select m.productos_id,p.nombre, p.unidad_medida,-sum(cantidad) as total_producto from ".$GLOBALS['vista_movimientos']." m,productos p where m.comprobante_asociado like 'REM%' and m.productos_id=p.id and m.fecha>=? and m.fecha<=? GROUP by m.productos_id,p.nombre, p.unidad_medida order by total_producto desc;",[$desde,$hasta]);	
 		}
 			
 	
@@ -257,10 +264,10 @@ Route::get('/remitos_pdf/{id}', function ($id) {
 	$venta = $venta[0];	
 	$formulario="REM".str_pad($id,6,"0", STR_PAD_LEFT);	
 	//$items_venta=array();
-	$items_venta=DB::select("select p.unidad_medida, v.productos_id, p.codigo,p.nombre, i.precio, -sum(v.cantidad) as subtotal from vista_movimientos v, productos p, item_venta i where i.ventas_id=? and i.movimientos_id=v.id and p.id=v.productos_id group by p.unidad_medida, v.productos_id, p.codigo,p.nombre, i.precio;",[$id]);
+	$items_venta=DB::select("select p.unidad_medida, v.productos_id, p.codigo,p.nombre, i.precio, -sum(v.cantidad) as subtotal from ".$GLOBALS['vista_movimientos']." v, productos p, item_venta i where i.ventas_id=? and i.movimientos_id=v.id and p.id=v.productos_id group by p.unidad_medida, v.productos_id, p.codigo,p.nombre, i.precio;",[$id]);
 
 		foreach ($items_venta as $i){
-				$items_venta_con_lotes_asignados[$i->productos_id]=DB::select ("select v.depositos_id,v.nombre_deposito,v.lote, -v.cantidad as cant from vista_movimientos v, item_venta i where i.ventas_id=? and i.movimientos_id=v.id and v.productos_id=?",[$id,$i->productos_id]);
+				$items_venta_con_lotes_asignados[$i->productos_id]=DB::select ("select v.depositos_id,v.nombre_deposito,v.lote, -v.cantidad as cant from ".$GLOBALS['vista_movimientos']." v, item_venta i where i.ventas_id=? and i.movimientos_id=v.id and v.productos_id=?",[$id,$i->productos_id]);
 		}
 
     require('mc_table.php');
@@ -352,7 +359,7 @@ Route::post('/ventas_no_cumplidas_seleccion', function () {
 		$items_pedidos=DB::select("select p.codigo,p.nombre,p.unidad_medida, i.producto_id, i.venta_id, i.cantidad as cant_pedida, v.fecha, c.razon_social from productos p, item_pedidos i, ventas v, clientes c where p.id=i.producto_id and v.id=i.venta_id and v.clientes_id=c.id and v.fecha>=? and v.fecha<=? order by i.producto_id;",[$desde, $hasta]);
 	}
 	foreach ($items_pedidos as $item){
-		$enviados=DB::select("select mv.productos_id, mv.comprobante_asociado,-sum(cantidad) as cant_enviada from vista_movimientos mv, item_venta v where v.ventas_id=? and v.movimientos_id=mv.id and mv.productos_id=? group by mv.productos_id, mv.comprobante_asociado;",[$item->venta_id,$item->producto_id]);
+		$enviados=DB::select("select mv.productos_id, mv.comprobante_asociado,-sum(cantidad) as cant_enviada from ".$GLOBALS['vista_movimientos']." mv, item_venta v where v.ventas_id=? and v.movimientos_id=mv.id and mv.productos_id=? group by mv.productos_id, mv.comprobante_asociado;",[$item->venta_id,$item->producto_id]);
 		if(count($enviados)==0) {
 			$cantidad_enviada=0;
 			$comp="";
@@ -384,12 +391,12 @@ Route::post('/ventas_seleccion', function () {
 	if($valor=="1") {//historico
 		$desde="";
 		$hasta="";
-		$ventas=DB::select ("select * from vista_ventas");	
+		$ventas=DB::select ("select * from ".$GLOBALS['vista_ventas']." vista_ventas");	
 	}
 	else {
 		$desde=date('Y-m-d', strtotime($_POST['fecha_desde']));
 		$hasta=date('Y-m-d', strtotime($_POST['fecha_hasta']));
-		$ventas=DB::select ("select * from vista_ventas where fecha>=? and fecha<=? order by fecha;",[$desde,$hasta]);	
+		$ventas=DB::select ("select * from ".$GLOBALS['vista_ventas']." vista_ventas where fecha>=? and fecha<=? order by fecha;",[$desde,$hasta]);	
 		
 	}
 	
@@ -411,12 +418,12 @@ Route::post('/ranking_ventas_seleccion', function () {
 	if($valor=="1") {//historico
 		$desde="";
 		$hasta="";
-		$ventas=DB::select ("select razon_social, sum(total) as total_cliente from vista_ventas group by razon_social order by total_cliente desc;");	
+		$ventas=DB::select ("select razon_social, sum(total) as total_cliente from ".$GLOBALS['vista_ventas']." vista_ventas group by razon_social order by total_cliente desc;");	
 	}
 	else {
 		$desde=date('Y-m-d', strtotime($_POST['fecha_desde']));
 		$hasta=date('Y-m-d', strtotime($_POST['fecha_hasta']));
-		$ventas=DB::select ("select razon_social, sum(total) as total_cliente from vista_ventas where fecha>=? and fecha<=? group by razon_social order by total_cliente desc;",[$desde,$hasta]);	
+		$ventas=DB::select ("select razon_social, sum(total) as total_cliente from ".$GLOBALS['vista_ventas']." vista_ventas where fecha>=? and fecha<=? group by razon_social order by total_cliente desc;",[$desde,$hasta]);	
 		
 	}
 	
@@ -436,7 +443,7 @@ Route::post('/ventasxlote_seleccion', function () {
 		$producto=DB::select("select * from productos where id=?;",[$_POST['producto']]);
 		$producto=$producto[0];
 
-		$ventasxlote=DB::select("select v.id, m.fecha, -m.cantidad as cantidad, m.comprobante_asociado, c.razon_social from vista_movimientos m, clientes c, item_venta i , ventas v where m.productos_id=? and m.lote=? and v.id=i.ventas_id and m.id=i.movimientos_id and v.clientes_id=c.id order by m.fecha asc;",[$_POST['producto'],$_POST['lote']]);
+		$ventasxlote=DB::select("select v.id, m.fecha, -m.cantidad as cantidad, m.comprobante_asociado, c.razon_social from ".$GLOBALS['vista_movimientos']." m, clientes c, item_venta i , ventas v where m.productos_id=? and m.lote=? and v.id=i.ventas_id and m.id=i.movimientos_id and v.clientes_id=c.id order by m.fecha asc;",[$_POST['producto'],$_POST['lote']]);
 
 	
 	
@@ -449,7 +456,7 @@ Route::post('/ventasxlote_seleccion', function () {
 //API
 Route::get('/lotes_producto/{id}', function ($id) {
 
-	$lotes_producto=DB::select("select p.lotes_produccion_id as id_lote_produccion, m.comprobante_asociado as comprobante FROM productos_lote_produccion p, vista_movimientos m WHERE p.productos_id=? and p.lotes_produccion_id=m.lote and p.productos_id=m.productos_id and m.comprobante_asociado like 'PROD%' order by p.lotes_produccion_id desc;",[$id]);
+	$lotes_producto=DB::select("select p.lotes_produccion_id as id_lote_produccion, m.comprobante_asociado as comprobante FROM productos_lote_produccion p, ".$GLOBALS['vista_movimientos']." m WHERE p.productos_id=? and p.lotes_produccion_id=m.lote and p.productos_id=m.productos_id and m.comprobante_asociado like 'PROD%' order by p.lotes_produccion_id desc;",[$id]);
 	
 	return \Response::json($lotes_producto, 200);
 

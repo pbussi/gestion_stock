@@ -64,7 +64,7 @@ Route::get('/movimiento_mp_salida/{id}', function ($id) {
 	$producto=$productos[0];
 
 	$saldos = DB::select('SELECT d.id as id_deposito,d.nombre as nombre_deposito,lotes_mp_id as id_lote_mp,productos_lote_produccion_id as id_lote_produccion_id,lote as numero_lote, vencimiento, sum(cantidad) as saldo 
-		FROM vista_movimientos m,depositos d 
+		FROM '.$GLOBALS['vista_movimientos'].'  m,depositos d 
 		WHERE  m.depositos_id=d.id and d.id<>13 and productos_id=? group by d.id,d.nombre,lotes_mp_id,productos_lote_produccion_id,lote,vencimiento having sum(cantidad)>0 order by vencimiento asc',[$id]);
 
 	if (count($saldos)==0) 
@@ -114,14 +114,14 @@ Route::get('/movimiento_producto/{id}', function ($id) {
 	$producto=$productos[0];
 	
 
-	$movs = DB::select("select * from vista_movimientos where productos_id=? order by fecha asc,id asc;",[$id]);
+	$movs = DB::select("select * from ".$GLOBALS['vista_movimientos']." v where productos_id=? order by fecha asc,id asc;",[$id]);
 
 	$movimientos=array();
 	foreach ($movs as $mov) {
 		$movimientos[$mov->deposito][]=$mov;
 	}
 
-	$saldoxdep=DB::select('select depositos_id as dep, sum(cantidad) as saldo from vista_movimientos where productos_id=? group by depositos_id',[$id]);
+	$saldoxdep=DB::select('select depositos_id as dep, sum(cantidad) as saldo from '.$GLOBALS['vista_movimientos'].' v where productos_id=? group by depositos_id',[$id]);
 	
 	$saldodeposito=array();
 	foreach($saldoxdep as $s){
@@ -160,7 +160,7 @@ Route::get('/movimiento_descarte/{id}', function ($id) {
 	$producto=$productos[0];
 
 	$saldos = DB::select('SELECT d.id as id_deposito,d.nombre as nombre_deposito,lotes_mp_id as id_lote_mp,productos_lote_produccion_id as id_lote_produccion_id,lote as numero_lote,vencimiento, sum(cantidad) as saldo 
-		FROM vista_movimientos m,depositos d 
+		FROM '.$GLOBALS['vista_movimientos'].' m,depositos d 
 		WHERE  m.depositos_id=d.id and d.id<>13 and productos_id=? group by d.id,d.nombre,lotes_mp_id,productos_lote_produccion_id,lote, vencimiento having sum(cantidad)>0 order by vencimiento asc',[$id]);
 	if (count($saldos)==0) 
 		return redirect()->route('movimiento_descarte_seleccion')->with('error','Producto sin stock!');	
